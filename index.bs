@@ -102,11 +102,10 @@ Because servers must specify the set of headers they are interested in receiving
 ### Common User Preferences ### {#common-user-preferences} 
 The following table suggests a minimal set of commonly used locale extensions to be supported:
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>'h12', 'h23', 'auto'<td>12-hour or 24-hour hour cycle</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>12-hour or 24-hour hour cycle</tr>
   <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
-
-  <tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
+  <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
 > Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.
@@ -144,15 +143,15 @@ Content-Type: text/html
 Accept-CH: Sec-CH-Locale-Extensions-NumberingSystem
 ```
 
-3. Subsequent requests to https://example.com will include the following request headers in case the user sets `numberingSystem` and `timeZone` values:
+3. Subsequent requests to https://example.com will include the following request headers in case `numberingSystem` is "native":
 
 ```http
 GET / HTTP/1.1
 Host: example.com
-Sec-CH-Locale-Extensions-NumberingSystem: "jpan" 
+Sec-CH-Locale-Extensions-NumberingSystem: "native" 
 ```
 
-4. The server can then tailor the response accordingly.
+4. The server can then tailor the response accordingly. For example, if the current locale is 'hi-IN', the server could generate content with numbers represented in Devanagari numerals.
 
 </div>
 
@@ -179,19 +178,41 @@ Navigator includes NavigatorLocaleExtensions;
 WorkerNavigator includes NavigatorLocaleExtensions;
 ```
 
-</pre>
-
 
 ### Proposed Syntax ### {#user-locale-extensions-javascript-api-proposed-syntax}
 <div class=example>
 ```js
 
-navigator.localeExtensions
-// Output => => {measurementUnit: "fahrenhe", hourCycle: "h12", ...}
+navigator.localeExtensions['numberingSystem'];
+navigator.localeExtensions.numberingSystem;
+self.navigator.localePreferences.languageRegion;
+// Output => => {numberingSystem: "latn"}
 
-TODO: figure out what the API should actually look like.
+navigator.localeExtensions['measurementUnit'];
+navigator.localeExtensions.measurementUnit;
+self.navigator.localePreferences.measurementUnit;
+// Output => => {measurementUnit: "celcius"}
 
+navigator.localeExtensions['hourCycle'];
+navigator.localeExtensions.hourCycle;
+self.navigator.localePreferences.hourCycle;
+// Output => => {measurementUnit: "h12"}
 
+// Window or WorkerGlobalScope event
+
+window.onlocaleextensions = (event) => {
+  console.log('localeextensions event detected!');
+};
+
+// Or
+
+window.addEventListener('localeextensions', () => {
+  console.log('localeextensions event detected!');
+});
+
+```
+
+</div>
 
 Privacy and Security Considerations {#privacy-and-security-considerations} 
 =====================
