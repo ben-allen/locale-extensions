@@ -37,7 +37,7 @@ Unicode Extensions for BCP 47 can be used to append additional information neede
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
-For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request, signalling that Unicode Locale Extensions are to be used.  
+For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request signalling that Unicode Locale Extensions are to be used.  
 
 ### Common Locale Extensions
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
