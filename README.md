@@ -29,12 +29,11 @@
 
 ## Introduction
 
-Unicode Extensions for BCP 47 can be used to append additional information capturing these settings to the end of language identifiers. Enabling support for BCP tags can help solve cases like:
+Unicode Extensions for BCP 47 can be used to append additional information capturing these settings to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
 
->Astrid works with a Swedish company and uses 'sv', but is most comfortable having dates and times displayed as in 'en-US'. Her OS is set to display time and measurements using these formats, and would find websites that use more accessible. 
+> Currently en-US is the typical untranslated language for software. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with hours of the day represented in a non-preferred 12 hour format and with temperatures represented in a confusingly unfamiliar measuring system.
 
->Developers of a NodeJS program may want to respect tailorings related to numbering system, as programs using non-preferred numbering systems may become unintellible to users. 
-
+> In many regions both Latin and Arabic-Indic numerals are in common use. Users in this region may find one or the other of these numbering systems unintelligible. 
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
@@ -44,7 +43,7 @@ For **server-side applications**, one way to access this information is through 
 The following table suggests a minimal set of commonly used locale extensions to be supported:
 <table>
   <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>12-hour or 24-hour hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system (Note restricted number of options)</tr>
   <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
@@ -161,9 +160,30 @@ window.addEventListener('localeextensions', () => {
 
 ## Privacy and Security Considerations
 
-There are some concerns that exposing this information would give trackers, advertisers and malicious web services another fingerprinting vector. That said, this information may or may not already be available to a certain extent to such services, based on the host and the user’s settings. The use of `Sec-CH-` prefix is to forbid access to these headers containing `Locale Preferences` information from JavaScript, and demarcate them as browser-controlled client hints so they can be documented and included in requests without triggering CORS preflights.
 
-Client Hints provides a powerful content negotiation mechanism that enables us to adapt content to users' needs without compromising their privacy. It does that by requiring server opt-in, which guarantees that access to the information requires active and tracable action on the server's side. As such, the mechanism does not increase the web's current active fingerprinting surface. The [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) of HTTP Client Hints and the [Security Considerations](https://tools.ietf.org/html/draft-davidben-http-client-hint-reliability-02#section-5) of Client Hint Reliability likewise apply to this proposal.
+--
+
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
+
+
+The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
+
+1. Decreasing the fingerprinting surface
+2. Increasing the anonymity set
+3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones) 
+4. Clearable local state
+
+
+As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of HTTP Client Hints, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, since servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors -- for example, the User Agent string -- and replace them with relatively easily detectable active vectors. 
+
+The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice.  
+
+This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the anonymity set. Both 'hourCycle' and 'measurementUnit' have three options apiece, as does 'numberingSystem', due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that may make them highly likely to become uniquely identifiable.
+
+Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
+
+As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
+
 
 
 
