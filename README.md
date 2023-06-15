@@ -164,10 +164,10 @@ window.addEventListener('localeextensions', () => {
 
 ## Privacy and Security Considerations
 
-There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since proactive content negotiation necessarily requires revealing information about users.
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
 
 
-The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following strategies for fingerprint mitigation, with strategies given in decreasing order of effectiveness: 
+The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
 
 1. Decreasing the fingerprinting surface
 2. Increasing the anonymity set
