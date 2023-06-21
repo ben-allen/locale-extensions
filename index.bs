@@ -8,7 +8,7 @@ Repository: ben-allen/locale-extensions
 URL: https://github.com/ben-allen/locale-extensions
 Editor: Ben Allen, Igalia https://igalia.com, benallen@igalia.com
 !Tests: 
-Abstract: This specification introduces a Client Hints header and a homologous JavaScript API that will allow a reliable way to use Unicode Extensions for BCP 47 to tailor content. This will allow web platform developers to improve the accessibility and usability of web applications.
+Abstract: This specification introduces a Client Hints header and a homologous JavaScript API that will allow the use of a subset of Unicode Extensions for BCP 47 to tailor content. This will allow web platform developers to improve the accessibility and usability of web applications.
 Markup Shorthands: markdown yes
 
 </pre>
@@ -66,18 +66,11 @@ Introduction {#introduction}
 
 Operating systems allow custom overrides to locale-specific settings. Failing to respect certain of these settings can result in reduced accessibility, and in some cases may result in the generation of content that is unintelligible to users. Examples in increasing level of importance include:
 
-* Hour cycle (24-hour or 12-hour time)
-* Measurement unit preferences (metric or imperial, Celcius or Fahrenheit)
-* Numbering system
+Unicode Extension for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. We propose adding support for a limited subset of these extensions in order to help solve common problems like the ones below:
 
-Unicode Extensions for BCP 47 can be used to append additional information capturing these settings to the end of language identifiers. Enabling support for BCP tags can help solve cases like:
+>Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius, and with time represented in a non-preferred 12 hour hour cycle. 
 
->Astrid works with a Swedish company and uses 'sv', but is most comfortable having dates and times displayed as in 'en-US'. Her OS is set to display time and measurements using these formats, and would find websites that use more accessible. 
-
->Developers of a NodeJS program may want to respect tailorings related to numbering system, as programs using non-preferred numbering systems may become unintellible to users. 
-
-[[[TODO BETTER EXAMPLES]]]
-
+>In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems unintelligible, and desire content tailored to the numbering system they use. 
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
@@ -87,26 +80,28 @@ For **server-side applications**, one way to access this information is through 
 Locale Extension Features {#locale-extensions-features}
 ====================
 
-We propose to address the above uses cases by using a [[!CLIENT-HINTS]] header and a homologous [[#javascript-api]]. Both will be responsible for exposing and negotiating the exchange of desired tailorings. We define a new standard <dfn export>`Locale-Extensions `</dfn> Client Hint and <dfn for='NavigatorLocaleExtensions' export>`navigator.localeExtensions`</dfn>, mapping locale settings using the following steps: 
+We propose to address the above uses cases by using a [[!CLIENT-HINTS]] header and a homologous [[#javascript-api]]. Both will be responsible for exposing and negotiating the exchange of desired tailorings. We define a new standard <dfn export>`Locale-Extensions`</dfn> Client Hint and <dfn for='NavigatorLocaleExtensions' export>`navigator.localeExtensions`</dfn>, mapping locale settings using the following steps: 
 
-1. Validate that locale extensions are allowed to be exposed.
+1. Validate that specific locale extensions are allowed to be exposed.
 2. Read the available OS tailorings
-3. Return values. 
+3. Return values for those exposed locale extensions.
 
 ## Client Hints ## {#locale-extensions-client-hints}
 
-An [=HTTP Client Hint=] is a request header field that is used by HTTP clients can be used by the server to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
+An [=HTTP Client Hint=] is a request header field that is used by HTTP clients to indicate preferred content tailorings. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
 
-Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for hostile passive fingerprinting that arise when using other means for proactive content negotiation (for example, the User-Agent string). 
+Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for hostile passive fingerprinting that arise when using other means for proactive content negotiation (for example, the User-Agent string). See the [privacy and security section below] for more details.
 
 ### Common User Preferences ### {#common-user-preferences} 
-The following table suggests a minimal set of commonly used locale extensions to be supported:
+The following table suggests a minimal set of commonly used locale extensions to be supported. Observe that the list of supported possible values for each extension is exhaustive.
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>12-hour or 24-hour hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `default`<td>12-hour or 24-hour hour cycle</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `default`<td>Preferred numbering system</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `default`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
+
+Limiting the range of options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to `latn`, `native`, and `default` allows content tailoring , such as `ta`, which have a `default` value other than `latn` and a separate `native` value differing from both `latn` and `default`. This allows servers to provide content tailored to three different 
 
 > Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.
 
