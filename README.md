@@ -43,9 +43,9 @@ For **server-side applications**, one way to access this information is through 
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
 
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `default`<td>Preferred hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `default`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `default`<td>Measurement unit for temperature</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `auto`<td>Preferred hour cycle</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
@@ -69,7 +69,7 @@ To accomplish this, browsers should introduce new `Client Hint` header fields as
 <table>
   <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h23"</tr>
   <tr><td><dfn export>`Sec-CH-Locale-Extensions-Numbering-System`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "native"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "default"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "auto"</tr>
 
   <thead><tr><th style=text:align left>Client Hint<th>Example output</thead>
 </table>
@@ -179,7 +179,7 @@ As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
 
 
-This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "default." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
+This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
 
 Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
 

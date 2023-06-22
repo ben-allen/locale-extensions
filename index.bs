@@ -90,13 +90,13 @@ The following table suggests a minimal subset of common locale extensions to be 
 
 ### Common Locale Extensions ### {#common-locale-extensions} 
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `default`<td>Preferred hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `default`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `default`<td>Measurement unit for temperature</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `auto`<td>Preferred hour cycle</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
-Limiting the range of options to a few sensible values helps reduce privacy and security risks related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to `latn`, `native`, and `default` allows clients to request one of up to three commonly used numbering systems in that language/region pair, without allowing for selections likely to make users individually identifiable. 
+Limiting the range of options to a few sensible values helps reduce privacy and security risks related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to `latn`, `native`, and `auto` allows clients to request one of up to three commonly used numbering systems in that language/region pair, without allowing for selections likely to make users individually identifiable. 
 
 > Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.
 
@@ -109,7 +109,7 @@ To accomplish this, browsers should introduce new `Client Hint` header fields as
 <table>
   <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h23"</tr>
   <tr><td><dfn export>`Sec-CH-Locale-ExtensionsNumbering-System`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "native"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "default"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "auto"</tr>
 
   <thead><tr><th style=text:align left>Client Hint<th>Example output</thead>
 </table>
@@ -226,7 +226,7 @@ As noted the security considerations of [[!CLIENT-HINTS]], a key benefit of the 
 
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
 
-This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "default." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
+This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
 
 As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
 
