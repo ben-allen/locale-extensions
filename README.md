@@ -33,7 +33,7 @@ Unicode Extensions for BCP 47 can be used to append additional information neede
 
 1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius. 
 
-2. In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems unintelligible, and desire content tailored to the numbering system they use. 
+2. In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar. 
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
@@ -43,9 +43,9 @@ For **server-side applications**, one way to access this information is through 
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
 
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>12-hour or 24-hour hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `default`<td>Preferred hour cycle</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `default`<td>Preferred numbering system</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `default`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
@@ -62,14 +62,14 @@ Because servers must specify the set of headers they are interested in receiving
 
 ### `Client Hint` Header Fields
 
-Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with preferred content tailorings. 
+Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with their preferred content tailorings. 
 
 To accomplish this, browsers should introduce new `Client Hint` header fields as part of a structured header as defined in <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-19">Structured Field Values for HTTP</a>.
 
 <table>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h24"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h23"</tr>
   <tr><td><dfn export>`Sec-CH-Locale-Extensions-Numbering-System`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "native"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "auto"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "default"</tr>
 
   <thead><tr><th style=text:align left>Client Hint<th>Example output</thead>
 </table>
@@ -87,7 +87,7 @@ GET / HTTP/1.1
 Host: example.com
 ```
 
-2. The server responds, sending along with the initial response an `Accept-CH` header (see [HTTP Client Hints Section 3.1, The `Accept-CH` Response Header Field](https://datatracker.ietf.org/doc/html/rfc8942#section-3.1)) with `Sec-CH-Locale-Extensions-NumberingSystem`. This indicates that the server accepts that particular Client Hint and no others. 
+2. The server responds, sending along with the initial response an `Accept-CH` header (see [HTTP Client Hints Section 3.1, The `Accept-CH` Response Header Field](https://datatracker.ietf.org/doc/html/rfc8942#section-3.1)) with `Sec-CH-Locale-Extensions-NumberingSystem`. This response indicates that the server accepts that particular Client Hint and no others. 
 
 ```http
 HTTP/1.1 200 OK
@@ -103,7 +103,7 @@ Host: example.com
 Sec-CH-Locale-Extensions-NumberingSystem: "native" 
 ```
 
-4. The server can then tailor the response accordingly. For example, if the current locale is 'hi-IN', the server could provide content with numbers represented using Devanagari numerals. 
+4. The server can then tailor the response accordingly. For example, if the current locale is `hi-IN`, the server could provide content with numbers represented using Devanagari numerals. 
 
 Note that servers **must** ignore hints that they do not support. 
 </div>
@@ -146,7 +146,7 @@ self.navigator.localeExtensions.measurementUnit;
 navigator.localeExtensions['hourCycle'];
 navigator.localeExtensions.hourCycle;
 self.navigator.localeExtensions.hourCycle;
-// Output => => "h12"
+// Output => => "h11"
 
 // Window or WorkerGlobalScope event
 
@@ -164,8 +164,7 @@ window.addEventListener('localeextensions', () => {
 
 ## Privacy and Security Considerations
 
-There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
-
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable to users from as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, particularly since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
 
 The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
 
@@ -180,7 +179,7 @@ As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
 
 
-This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both 'hourCycle' and 'measurementUnit' have three options apiece, as does 'numberingSystem', due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
+This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "default." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
 
 Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
 

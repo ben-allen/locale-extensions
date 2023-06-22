@@ -6,15 +6,16 @@ Status: CG-DRAFT
 Group: WICG
 Repository: ben-allen/locale-extensions
 URL: https://github.com/ben-allen/locale-extensions
-Editor: Ben Allen, Igalia https://igalia.com, benallen@igalia.com
+Editor: Ben Allen, Igalia, https://igalia.com, benallen@igalia.com
 !Tests: 
 Abstract: This specification introduces a Client Hints header and a homologous JavaScript API that will allow the use of a subset of Unicode Extensions for BCP 47 to tailor content. This will allow web platform developers to improve the accessibility and usability of web applications.
 Markup Shorthands: markdown yes
 
 </pre>
 
-<pre class=biblio>
 
+
+<pre class=biblio>
 {
   "CLIENT-HINTS": {
     "authors": ["Ilya Grigorik", "Yoav Weiss"],
@@ -30,16 +31,13 @@ Markup Shorthands: markdown yes
     "status": "ID",
     "publisher": "IETF httpbis-WG"
   },
-  "draft-davidben-http-client-hint-reliability-02": {
-    "authors": ["David Benjamin"],
-    "href": "https://tools.ietf.org/html/draft-davidben-http-client-hint-reliability-02",
-    "title": "Client Hint Reliability",
-    "status": "ID",
-    "publisher": "IETF httpbis-WG"
+  "mitigating-browser-fingerprinting": {
+    "editor": "Nick Doty",
+    "href": "https://www.w3.org/TR/fingerprinting-guidance/",
+    "title": "Mitigating Browser Fingerprinting in Web Specifications",
+    "status": "TR"
   }
 }
-
-
 </pre>
 
 <pre class="anchors">
@@ -50,27 +48,23 @@ urlPrefix: https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-header-struc
 urlPrefix: https://cldr.unicode.org/index/bcp47-extension; spec: bcp47-extension
     type: dfn
         text: Unicode Extensions for BCP 47
-        text: HTTP Client Hint
-urlPrefix: https://github.com/tc39/ecma402/issues/416#issue-574957588
-    type: dfn
-        text: common user preferences 
 urlPrefix: https://tools.ietf.org/html/draft-davidben-http-client-hint-reliability-02
     type: dfn
         text:Security Considerations of Client Hint Reliability; url: #section-5
-
+urlPrefix: https://datatracker.ietf.org/doc/html/rfc8942
+    type: dfn
+        text: HTTP Client Hint
 </pre>
 
 
 Introduction {#introduction}
 =====
 
-Operating systems allow custom overrides to locale-specific settings. Failing to respect certain of these settings can result in reduced accessibility, and in some cases may result in the generation of content that is unintelligible to users. Examples in increasing level of importance include:
+[=Unicode Extensions for BCP 47=] can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
 
-Unicode Extension for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. We propose adding support for a limited subset of these extensions in order to help solve common problems like the ones below:
+>Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius.
 
->Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius, and with time represented in a non-preferred 12 hour hour cycle. 
-
->In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems unintelligible, and desire content tailored to the numbering system they use. 
+>In many regions both Western Arabic (Latin) and Eastern Arabic (Arabic-Indic) numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar. 
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
@@ -88,38 +82,41 @@ We propose to address the above uses cases by using a [[!CLIENT-HINTS]] header a
 
 ## Client Hints ## {#locale-extensions-client-hints}
 
-An [=HTTP Client Hint=] is a request header field that is used by HTTP clients to indicate preferred content tailorings. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
+An [=HTTP Client Hint=] is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
 
-Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for hostile passive fingerprinting that arise when using other means for proactive content negotiation (for example, the User-Agent string). See the [privacy and security section below] for more details.
+Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for passive fingerprinting that arise when using other means for proactive content negotiation (for example, the User-Agent string). See the [privacy and security section below] for more details.
 
-### Common User Preferences ### {#common-user-preferences} 
-The following table suggests a minimal set of commonly used locale extensions to be supported. Observe that the list of supported possible values for each extension is exhaustive.
+The following table suggests a minimal subset of common locale extensions to be supported. Observe that the list of supported possible values for each extension is exhaustive.
+
+### Common Locale Extensions ### {#common-locale-extensions} 
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `default`<td>12-hour or 24-hour hour cycle</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `default`<td>Preferred hour cycle</tr>
   <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `default`<td>Preferred numbering system</tr>
   <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `default`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
-Limiting the range of options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to `latn`, `native`, and `default` allows content tailoring , such as `ta`, which have a `default` value other than `latn` and a separate `native` value differing from both `latn` and `default`. This allows servers to provide content tailored to three different 
+Limiting the range of options to a few sensible values helps reduce privacy and security risks related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to `latn`, `native`, and `default` allows clients to request one of up to three commonly used numbering systems in that language/region pair, without allowing for selections likely to make users individually identifiable. 
 
 > Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.
 
 ### `Client Hint` Header fields ### {#client-hint-header-fields}
 
-Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with preferred content tailorings. 
+Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with their preferred content tailorings. 
 
 To accomplish this, browsers should introduce new `Client Hint` header fields as part of a [=structured header=] as defined in [[!draft-ietf-httpbis-header-structure-19]]:
 
 <table>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h24"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h23"</tr>
   <tr><td><dfn export>`Sec-CH-Locale-ExtensionsNumbering-System`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "native"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "auto"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "default"</tr>
 
   <thead><tr><th style=text:align left>Client Hint<th>Example output</thead>
 </table>
 
-### Usage example ### {#locale-extensions-example} 
+The `Sec-` prefix used on these headers prevents scripts and other application content from setting them in user agents, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. See [HTTP Client Hints Section 4.2, Deployment and Security Risks](https://datatracker.ietf.org/doc/html/rfc8942#section-4.2) for more information. 
+
+### Usage example ### {#locale-extensions-client-hint-example} 
 
 <div class=example>
 
@@ -130,7 +127,7 @@ GET / HTTP/1.1
 Host: example.com
 ```
 
-2. The server responds, telling the client via an `Accept-CH` header (Section 2.2.1 of [[!RFC8942]]) along with the initial response with `Sec-CH-Locale-Extensions-NumberingSystem`, indicating that the server accepts that particular Client Hint and no others.
+2. The server responds, telling the client via an `Accept-CH` header (Section 2.2.1 of [[!RFC8942]]) along with the initial response with `Sec-CH-Locale-Extensions-NumberingSystem`. This response indicates that the server accepts that particular Client Hint and no others.
 
 ```http
 HTTP/1.1 200 OK
@@ -146,16 +143,18 @@ Host: example.com
 Sec-CH-Locale-Extensions-NumberingSystem: "native" 
 ```
 
-4. The server can then tailor the response accordingly. For example, if the current locale is 'hi-IN', the server could generate content with numbers represented in Devanagari numerals.
+4. The server can then tailor the response accordingly. For example, if the current locale is `hi-IN`, the server could generate content with numbers represented in Devanagari numerals.
 
+Note that servers **must** ignore hints that they do not support. 
 </div>
 
 ## JavaScript API ## {#javascript-api}
 
-These client hints should also be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` information as below:
+These client hints should also be exposed as JavaScript APIs via `navigator.locales` as suggested in [#68](https://github.com/tc39/ecma402/issues/68), or by creating a new `navigator.localeExtensions` property:
 
 ### IDL ### {#locale-extensions-javascript-idl} 
 
+<pre class="idl">
 
 ```
 dictionary LocaleExtensions {
@@ -163,7 +162,6 @@ dictionary LocaleExtensions {
   DOMString numberingSystem;
   DOMString hourCycle;
 };
-
 
 interface mixin NavigatorLocaleExtensions {
   readonly attribute LocaleExtensions localeExtensions;
@@ -173,6 +171,7 @@ Navigator includes NavigatorLocaleExtensions;
 WorkerNavigator includes NavigatorLocaleExtensions;
 ```
 
+</pre>
 
 ### Proposed Syntax ### {#user-locale-extensions-javascript-api-proposed-syntax}
 <div class=example>
@@ -181,17 +180,17 @@ WorkerNavigator includes NavigatorLocaleExtensions;
 navigator.localeExtensions['numberingSystem'];
 navigator.localeExtensions.numberingSystem;
 self.navigator.localePreferences.languageRegion;
-// Output => => {numberingSystem: "latn"}
+// Output => => "latn"
 
 navigator.localeExtensions['measurementUnit'];
 navigator.localeExtensions.measurementUnit;
 self.navigator.localePreferences.measurementUnit;
-// Output => => {measurementUnit: "celcius"}
+// Output => => "celcius"
 
 navigator.localeExtensions['hourCycle'];
 navigator.localeExtensions.hourCycle;
 self.navigator.localePreferences.hourCycle;
-// Output => => {measurementUnit: "h12"}
+// Output => => "h11"
 
 // Window or WorkerGlobalScope event
 
@@ -212,8 +211,25 @@ window.addEventListener('localeextensions', () => {
 Privacy and Security Considerations {#privacy-and-security-considerations} 
 =====================
 
-Client Hints provides a powerful content negotiation mechanism that enables us to adapt content to users' needs without compromising their privacy. It does this by requireing server opt-in, which guarantees that access to the information requires active and tracable action on the server's side. As such, the mechanism does not increase the web's current passive fingerprinting surface, while removing the need to use other means (for example, User-Agent strings) which may themselves provide passive fingerprinting surfaces. 
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable to users from as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, particularly since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
 
-The use of the `Sec-CH-` prefix is to forbid access to headers containing `Locale Extensions` information from JavaScript, and to demarcate them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
+[[!Mitigating-Browser-Fingerprinting]] identifies the following key elements for fingerprint mitigation, with strength of mitigation given in descending order: 
 
-The Security Considerations of [[!CLIENT-HINTS]] and [[!draft-davidben-http-client-hint-reliability-02]] likewise apply to this proposal.
+1. Decreasing the fingerprinting surface
+2. Increasing the anonymity set
+3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones) 
+4. Clearable local state
+
+This proposal is designed to whenever possible deploy these strategies as appropriate, with preference given to the more effective mitigations higher in the list whenever possible.
+
+As noted the security considerations of [[!CLIENT-HINTS]], a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [[!fingerprinting-guidance]] describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice.  
+
+The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
+
+This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "default." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
+
+As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
+
+
+
+
