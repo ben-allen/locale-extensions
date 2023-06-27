@@ -119,12 +119,12 @@ Note that servers **must** ignore hints that they do not support.
 
 ## Agent-Driven Negotiation
 
-In addition to the use of Client Hints for proactive negotiation of locale extensions-related settings, we also propose a JavaScript API. This API allows for client-side locale extension-based content tailoring, and can be used in environments where the Client Hints architecture is not implemented.
+We propose a JavaScript API allowing for client-side locale extension-based content tailoring:
 
-### JavaScript API 
+## JavaScript API 
 
 
-The locale extensions preferred by the user should also be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
+The locale extensions preferred by the user should be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
 
 ### IDL 
 
@@ -160,7 +160,7 @@ self.navigator.localeExtensions.measurementUnit;
 navigator.localeExtensions['hourCycle'];
 navigator.localeExtensions.hourCycle;
 self.navigator.localeExtensions.hourCycle;
-// Output => => "h11"
+// Output => => "h12"
 
 // Window or WorkerGlobalScope event
 
@@ -197,8 +197,6 @@ system and also a "default" numbering system that differs from both the "native"
 As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice. In the absence of Client Hints, use of the JavaScript API can at least be detected by clients. In no case does this proposal allow for any new passive fingerprinting vectors. 
 
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
-
-Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
 
 As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
 
