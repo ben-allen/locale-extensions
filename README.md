@@ -1,4 +1,4 @@
-# Explainer: Locale Extensions 
+Explainer: Locale Extensions 
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ For **client-side applications**, the best way to get these preferences is throu
 
 For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request, signalling that Unicode Locale Extensions are to be used. 
 
-In both of these cases the browser conveys data related to the user's operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings only having three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an `Accept-CH` header or else issue a detectable query to the client.
+In both of these cases the browser conveys data related to the user's operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings having at most three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an `Accept-CH` header or else issue a detectable query to the client.
 
 ### Common Locale Extensions
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
@@ -178,7 +178,7 @@ window.addEventListener('localeextensions', () => {
 
 ## Privacy and Security Considerations
 
-There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since content negotiation necessarily requires revealing information about users.
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content accessible to and usable by people from as wide a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since content negotiation necessarily requires revealing information about users.
 
 The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
 
@@ -187,21 +187,43 @@ The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org
 3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones) 
 4. Clearable local state
 
-Our central strategy in both parts of this proposal for allowing a marked improvement in the localization experience for many users while mitigating fingerprinting risk is the reduction of the available set of locale extensions to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both 'hourCycle' and 'measurementUnit' have three options apiece, as does 'numberingSystem', due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users. 
+The preservation of a relatively large anonymity set is our central strategy for mitigating fingerprinting risk as much as possible while also ensuring a substantial improvement in the localization experience for a wide range of users. 
 
-As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice.  
+* 'hourCycle' always provides users with both of the most commonly used hour cycles plus their region's default, should that default differ from "h12" and "h23". while protecting users from making themselves immediately individually indentifiable by revealing that they use a particularly uncommon hour cycle for their region.
+* 'measurementUnit' already allows only three options.
+* 'numberingSystem' has its set of available options limited to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, extending the full set of three options available in language/region pairs that have a "native" numbering :w
+system and also a "default" numbering system that differs from both the "native" numbering system and from "latn". This compromise extends to as many users as possible the ability to specify an intelligible numbering system, without allowing for selections that are likely to immediately uniquely identify users. 
+
+As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice. In the absence of Client Hints, use of the JavaScript API can at least be detected by clients. In no case does this proposal allow for any new passive fingerprinting vectors. 
 
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
-
-This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
 
 Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
 
 As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
 
-Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extension settings sent by users who already have a small anonymity set, either because of other information exposed by the client or because of being in a language/region pair with relatively fewer users. In this case preference would be given to always sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of crucial localization settings without making themselves individually identifiable.
+Implementations may also include additional fingerprinting mitigations. For example, clients could restrict the number of Locale Extension settings sent by users who already have a small anonymity set, either because of other information exposed by the client or because of being in a language/region pair with relatively fewer users. In this case preference would be given to always sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of crucial localization settings without making themselves individually identifiable. Additionally, user agents can make decisions about what to reveal to what sites; cross-origin sites, for example, could be allowed access to less data than top-level sites the user visits frequently. 
 
+## FAQ
 
+### What about clients that don't implement Client Hints?
 
+Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general &mdash; the extra request required, etc. 
 
+### Why this specific selection of tags?
 
+We've selected a best-guess set of tags and available options for those tags based on the following criteria:
+
+1. Would revealing OS settings related to this tag result in major intelligibility benefits for users?
+2. Would revealing OS settings related to this tag result in the reduction of annoyances for a large group of users?
+3. Can we approach these goals while only revealing relatively coarse-grained information about users?
+
+There are additional tags which can be considered: for example, `fw` is a candidate, presumably with valid options limited to the first day of week options most commonly used. `ms` would be a strong candidate, were it not slated to be deprecated. 
+
+User research may be useful in determining what sets of tags are best for negotiating the balance between more precise content tailorings and the potential fingerprinting risks.
+
+### Maintaining a large anonymity set for users in smaller language/region pairs?
+
+A user of `en-US` or `zh` is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. This leads to the unpleasant conclusion that mitigating fingerprint risk may require allowing users of common language/region pairs significantly more control over their desired content tailorings than users of less common ones. Should it prove necessary to provide these users fewer options, preference should be given to the locale extensions that are most likely to directly affect content intelligibility.
+
+An alternate strategy for determining what options are available may involve allowing option selections that tend to correlate with each other (for example, the use of "h23" for hour cycle and "celcius" for measurement unit) to be set together, but not separately. User research would be required to determine the most needed sets of commonly-seen-together selections. 
