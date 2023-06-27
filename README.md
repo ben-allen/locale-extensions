@@ -7,7 +7,7 @@ Explainer: Locale Extensions
   - [Authors:](#authors)
   - [Participate](#participate)
   - [Motivation](#motivation)
-  - [Motivation](#overview)
+  - [Overview](#overview)
   - [Common Locale Extensions](#common-locale-extensions)
   - [JavaScript API](#agent-driven-negotiation-javascript-api)
       - [IDL](#idl)
