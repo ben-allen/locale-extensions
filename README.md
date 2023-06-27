@@ -6,16 +6,19 @@ Explainer: Locale Extensions
   - [Table of Contents](#table-of-contents)
   - [Authors:](#authors)
   - [Participate](#participate)
-  - [Introduction](#introduction)
-  - [Common User Preferences](#common-user-preferences)
+  - [Motivation](#motivation)
+  - [Motivation](#overview)
+  - [Common Locale Extensions](#common-locale-extensions)
   - [JavaScript API](#agent-driven-negotiation-javascript-api)
       - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
-  - [Client Hints](#client-hints)
+  - [Client Hints](#proactive-content-negotiation-with-client-hints) 
       - [`Client Hint` Header Fields](#client-hint-header-fields)
       - [Usage Example](#usage-example)
   - [Privacy and Security Considerations](#privacy-and-security-considerations)
   - [FAQ](#faq)
+
+#proactive-content-negotiation-with-client-hints#
 
 ## Authors:
 
@@ -203,7 +206,6 @@ This proposal could help reduce the fingerprinting surface as a whole by providi
 
 
 ## FAQ
-
 
 ### Why this specific selection of tags?
 
