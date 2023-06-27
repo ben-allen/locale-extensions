@@ -203,11 +203,11 @@ As in all uses of Client Hints, user agents must clear opt-in Client Hints setti
 
 Implementations may also include additional fingerprinting mitigations. For example, clients could restrict the number of Locale Extension settings sent by users who already have a small anonymity set, either because of other information exposed by the client or because of being in a language/region pair with relatively fewer users. In this case preference would be given to always sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of crucial localization settings without making themselves individually identifiable. Additionally, user agents can make decisions about what to reveal to what sites; cross-origin sites, for example, could be allowed access to less data than top-level sites the user visits frequently. 
 
+This proposal could help reduce the fingerprinting surface as a whole by providing a mechanism to get many of the benefits of the `Accept-Language` header without that header's passive fingerprinting implications.
+
+
 ## FAQ
 
-### What about clients that don't implement Client Hints?
-
-Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general &mdash; the extra request required, etc. 
 
 ### Why this specific selection of tags?
 
@@ -221,8 +221,20 @@ There are additional tags which can be considered: for example, `fw` is a candid
 
 User research may be useful in determining what sets of tags are best for negotiating the balance between more precise content tailorings and the potential fingerprinting risks.
 
+### What about clients that don't implement Client Hints?
+
+Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general &mdash; the extra request required, etc. 
+
 ### Maintaining a large anonymity set for users in smaller language/region pairs?
 
 A user of `en-US` or `zh` is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. This leads to the unpleasant conclusion that mitigating fingerprint risk may require allowing users of common language/region pairs significantly more control over their desired content tailorings than users of less common ones. Should it prove necessary to provide these users fewer options, preference should be given to the locale extensions that are most likely to directly affect content intelligibility.
 
+### Alternate strategies to consider?
+
 An alternate strategy for determining what options are available may involve allowing option selections that tend to correlate with each other (for example, the use of "h23" for hour cycle and "celcius" for measurement unit) to be set together, but not separately. User research would be required to determine the most needed sets of commonly-seen-together selections. 
+
+One way to implement bundles of preferences that tend to track together may be to implement commonly used values for the `rg` Unicode Extension, which could allow users to (for example) set their locales to "en-US-u-rg-gbzzzz", which would result in content in US English but with region-specific defaults set to those of British English. 
+
+### Options that aren't captured by Unicode Extensions for BCP 47
+
+There exist other localization-related customizations that would be useful for site intelligibility and that could potentially be constrained to a small number of options -- notably 
