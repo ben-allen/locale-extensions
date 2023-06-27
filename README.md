@@ -56,7 +56,7 @@ In both of these cases the browser conveys data related to the user's operating 
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
 
 <table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h11`, `h23`, `auto`<td>Preferred hour cycle</tr>
+  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>Preferred hour cycle</tr>
   <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
   <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
