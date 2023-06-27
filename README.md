@@ -8,13 +8,14 @@ Explainer: Locale Extensions
   - [Participate](#participate)
   - [Introduction](#introduction)
   - [Common User Preferences](#common-user-preferences)
+  - [Javascript API](#javascript-api)
+      - [IDL](#idl)
+      - [Proposed Syntax](#proposed-syntax)
   - [Client Hints](#client-hints)
       - [`Client Hint` Header Fields](#client-hint-header-fields)
       - [Usage Example](#usage-example)
-    - [Javascript API](#javascript-api)
-      - [IDL](#idl)
-      - [Proposed Syntax](#proposed-syntax)
   - [Privacy and Security Considerations](#privacy-and-security-considerations)
+  - [FAQ](#faq)
 
 ## Authors:
 
@@ -29,7 +30,7 @@ Explainer: Locale Extensions
 
 ## Motivation
 
-Frequently web application users need content localizaed in ways that partially diverge from the defaults used in their language or region. Mismatches between desired and actually delivered content can sometimes result in user frustration or annoyance &mdash; to give one common example, consider the error-prone mental math involved in converting a temperature measured in the Fahrenheit scale when one is more familiar with Celcius. Beyond this,  failure to deliver the desired content tailorings may result in the content becoming inaccessible or even completely unintelligible to some users. This may occur, for example, for users whose preferred numbering system differs from the numbering system used by default in their locale/region pair. 
+Frequently web application users need content localized in ways that partially diverge from the defaults used in their language or region. Mismatches between desired and actually delivered content can sometimes result in user frustration or annoyance &mdash; to give one common example, consider the error-prone mental math involved in converting a temperature measured in the Fahrenheit scale when one is more familiar with Celcius. Beyond this,  failure to deliver the desired content tailorings may result in the content becoming inaccessible or even completely unintelligible to some users. This may occur, for example, for users whose preferred numbering system differs from the numbering system used by default in their locale/region pair. 
 
 In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, the full amount of flexibility allowed for in the native environment is not possible in the web environment. This proposal defines a mechanism by making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
 
