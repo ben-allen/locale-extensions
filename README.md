@@ -27,17 +27,26 @@
 - [Issue tracker](/issues)
 
 
-## Introduction
+## Motivation
+
+Frequently web application users need content localizaed in ways that partially diverge from the defaults used in their language or region. Mismatches between desired and actually delivered content can sometimes result in user frustration or annoyance &mdash; to give one common example, consider the error-prone mental math involved in converting a temperature measured in the Fahrenheit scale when one is more familiar with Celcius. Beyond this,  failure to deliver the desired content tailorings may result in the content becoming inaccessible or even completely unintelligible to some users. This may occur, for example, for users whose preferred numbering system differs from the numbering system used by default in their locale/region pair. 
+
+In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, the full amount of flexibility allowed for in the native environment is not possible in the web environment. This proposal defines a mechanism by making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
+
+
+## Overview 
 
 Unicode Extensions for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
 
-1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius. 
+1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale that is confusing and unfamiliar to users from regions that use Celcius. 
 
 2. In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar. 
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
-For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request signalling that Unicode Locale Extensions are to be used.  
+For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request, signalling that Unicode Locale Extensions are to be used. 
+
+In both of these cases the browser conveys data related to the user's operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings only having three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an `Accept-CH` header or else issue a detectable query to the client.
 
 ### Common Locale Extensions
 The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
@@ -50,10 +59,10 @@ The following table suggests a minimal set of commonly used locale extensions to
 </table>
 
 
-> Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.
+> Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders. 
 
 
-## Client Hints ##
+## Proactive Content Negotiation With Client Hints ##
 
 An <a href="https://datatracker.ietf.org/doc/rfc8942/">HTTP Client Hint</a> is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
 
@@ -108,9 +117,14 @@ Sec-CH-Locale-Extensions-NumberingSystem: "native"
 Note that servers **must** ignore hints that they do not support. 
 </div>
 
-## JavaScript API 
+## Agent-Driven Negotiation
 
-These client hints should also be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property.
+In addition to the use of Client Hints for proactive negotiation of locale extensions-related settings, we also propose a JavaScript API. This API allows for client-side locale extension-based content tailoring, and can be used in environments where the Client Hints architecture is not implemented.
+
+### JavaScript API 
+
+
+The locale extensions preferred by the user should also be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
 
 ### IDL 
 
@@ -164,7 +178,7 @@ window.addEventListener('localeextensions', () => {
 
 ## Privacy and Security Considerations
 
-There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable to users from as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, particularly since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.
+There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable in as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since content negotiation necessarily requires revealing information about users.
 
 The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
 
@@ -173,17 +187,20 @@ The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org
 3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones) 
 4. Clearable local state
 
+Our central strategy in both parts of this proposal for allowing a marked improvement in the localization experience for many users while mitigating fingerprinting risk is the reduction of the available set of locale extensions to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both 'hourCycle' and 'measurementUnit' have three options apiece, as does 'numberingSystem', due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users. 
 
 As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice.  
 
 The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
-
 
 This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user's anonymity set. Both `hourCycle` and `measurementUnit` have three options apiece, as does `numberingSystem`, due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.
 
 Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extensions Client Hints sent by users who already have a small anonymity set, with preference given to sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of these localization features without making themselves individually identifiable. 
 
 As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
+
+Implementations may also include other fingerprinting mitigations. For example, clients could restrict the number of Locale Extension settings sent by users who already have a small anonymity set, either because of other information exposed by the client or because of being in a language/region pair with relatively fewer users. In this case preference would be given to always sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of crucial localization settings without making themselves individually identifiable.
+
 
 
 
