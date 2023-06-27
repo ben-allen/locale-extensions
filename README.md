@@ -224,7 +224,7 @@ Using Locale Extensions is still possible through the JavaScript API. Use of the
 
 ### Maintaining a large anonymity set for users in smaller language/region pairs?
 
-A user of `en-US` or `zh` is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. This leads to the unpleasant conclusion that mitigating fingerprint risk may require allowing users of common language/region pairs significantly more control over their desired content tailorings than users of less common ones. Should it prove necessary to provide these users fewer options, preference should be given to the locale extensions that are most likely to directly affect content intelligibility.
+A user of `en-US` or `zh-CN` is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. This leads to the unpleasant conclusion that mitigating fingerprint risk may require allowing users of common language/region pairs significantly more control over their desired content tailorings than users of less common ones. Should it prove necessary to provide these users fewer options, preference should be given to the locale extensions that are most likely to directly affect content intelligibility.
 
 ### Alternate strategies to consider?
 
