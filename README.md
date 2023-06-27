@@ -8,7 +8,7 @@ Explainer: Locale Extensions
   - [Participate](#participate)
   - [Introduction](#introduction)
   - [Common User Preferences](#common-user-preferences)
-  - [Javascript API](#javascript-api)
+  - [JavaScript API](#agent-driven-negotiation-javascript-api)
       - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
   - [Client Hints](#client-hints)
