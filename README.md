@@ -4,7 +4,7 @@ Explainer: Locale Extensions
 
 - [Explainer:  Locale Extensions](#explainer-locale-extensions)
   - [Table of Contents](#table-of-contents)
-  - [Authors:](#authors)
+  - [Authors](#authors)
   - [Participate](#participate)
   - [Motivation](#motivation)
   - [Overview](#overview)
@@ -33,10 +33,9 @@ Explainer: Locale Extensions
 
 ## Motivation
 
-Frequently web application users need content localized in ways that partially diverge from the defaults used in their language or region. Mismatches between desired and actually delivered content can sometimes result in user frustration or annoyance &mdash; to give one common example, consider the error-prone mental math involved in converting a temperature measured in the Fahrenheit scale when one is more familiar with Celcius. Beyond this,  failure to deliver the desired content tailorings may result in the content becoming inaccessible or even completely unintelligible to some users. This may occur, for example, for users whose preferred numbering system differs from the numbering system used by default in their locale/region pair. 
+Frequently web application users need content localized in ways that partially diverge from the defaults used in their language or region. Mismatches between desired and actually delivered content can sometimes result in user frustration or annoyance; to give one common example, having to interpret a temperature measured in the Fahrenheit scale when one is more familiar with Celcius. Beyond annoyance, though, failure to deliver the desired content tailorings may result in the content becoming genuinely unintelligible to some users. This may occur, for example, for users whose preferred numbering system differs from the numbering system used by default in their locale/region pair. 
 
 In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, the full amount of flexibility allowed for in the native environment is not possible in the web environment. This proposal defines a mechanism by making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
-
 
 ## Overview 
 
@@ -231,7 +230,7 @@ A user of `en-US` or `zh` is, all else being equal, going to be more anonymous t
 
 An alternate strategy for determining what options are available may involve allowing option selections that tend to correlate with each other (for example, the use of "h23" for hour cycle and "celcius" for measurement unit) to be set together, but not separately. User research would be required to determine the most needed sets of commonly-seen-together selections. 
 
-One way to implement bundles of preferences that tend to track together may be to implement commonly used values for the `rg` Unicode Extension, which could allow users to (for example) set their locales to "en-US-u-rg-gbzzzz", which would result in content in US English but with region-specific defaults set to those of British English. 
+One way to implement bundles of preferences that tend to track together may be to implement commonly used values for the `rg` Unicode Extension. This could allow users to (for example) set their locales to "en-US-u-rg-gbzzzz", which would result in content in US English but with region-specific defaults set to those of British English. 
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
