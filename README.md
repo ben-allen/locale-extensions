@@ -63,6 +63,61 @@ The following table suggests a minimal set of commonly used locale extensions to
 > Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders. 
 
 
+## Agent-Driven Negotiation: JavaScript API 
+
+The locale extensions preferred by the user should be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
+
+### IDL 
+
+```
+dictionary LocaleExtensions {
+  DOMString measurementUnit;
+  DOMString numberingSystem;
+  DOMString hourCycle;
+};
+
+interface mixin NavigatorLocaleExtensions {
+  readonly attribute LocaleExtensions localeExtensions;
+};
+
+Navigator includes NavigatorLocaleExtensions;
+WorkerNavigator includes NavigatorLocaleExtensions;
+```
+
+### Proposed Syntax
+
+```js
+
+navigator.localeExtensions['numberingSystem'];
+navigator.localeExtensions.numberingSystem;
+self.navigator.localeExtensions.numberingSystem;
+// Output => => "latn"
+
+navigator.localeExtensions['measurementUnit'];
+navigator.localeExtensions.measurementUnit;
+self.navigator.localeExtensions.measurementUnit;
+// Output => => "celcius"
+
+navigator.localeExtensions['hourCycle'];
+navigator.localeExtensions.hourCycle;
+self.navigator.localeExtensions.hourCycle;
+// Output => => "h12"
+
+// Window or WorkerGlobalScope event
+
+window.onlocaleextensions = (event) => {
+  console.log('localeextensions event detected!');
+};
+
+// Or
+
+window.addEventListener('localeextensions', () => {
+  console.log('localeextensions event detected!');
+});
+
+```
+
+
 ## Proactive Content Negotiation With Client Hints ##
 
 An <a href="https://datatracker.ietf.org/doc/rfc8942/">HTTP Client Hint</a> is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
@@ -117,65 +172,6 @@ Sec-CH-Locale-Extensions-NumberingSystem: "native"
 
 Note that servers **must** ignore hints that they do not support. 
 </div>
-
-## Agent-Driven Negotiation
-
-We propose a JavaScript API allowing for client-side locale extension-based content tailoring:
-
-## JavaScript API 
-
-
-The locale extensions preferred by the user should be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
-
-### IDL 
-
-```
-dictionary LocaleExtensions {
-  DOMString measurementUnit;
-  DOMString numberingSystem;
-  DOMString hourCycle;
-};
-
-interface mixin NavigatorLocaleExtensions {
-  readonly attribute LocaleExtensions localeExtensions;
-};
-
-Navigator includes NavigatorLocaleExtensions;
-WorkerNavigator includes NavigatorLocaleExtensions;
-```
-
-### Proposed Syntax
-
-```js
-
-navigator.localeExtensions['numberingSystem'];
-navigator.localeExtensions.numberingSystem;
-self.navigator.localeExtensions.numberingSystem;
-// Output => => "latn"
-
-navigator.localeExtensions['measurementUnit'];
-navigator.localeExtensions.measurementUnit;
-self.navigator.localeExtensions.measurementUnit;
-// Output => => "celcius"
-
-navigator.localeExtensions['hourCycle'];
-navigator.localeExtensions.hourCycle;
-self.navigator.localeExtensions.hourCycle;
-// Output => => "h12"
-
-// Window or WorkerGlobalScope event
-
-window.onlocaleextensions = (event) => {
-  console.log('localeextensions event detected!');
-};
-
-// Or
-
-window.addEventListener('localeextensions', () => {
-  console.log('localeextensions event detected!');
-});
-
-```
 
 ## Privacy and Security Considerations
 
@@ -237,4 +233,4 @@ One way to implement bundles of preferences that tend to track together may be t
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
-There exist other localization-related customizations that would be useful for site intelligibility and that could potentially be constrained to a small number of options -- notably 
+There exist other localization-related customizations that would be useful for site intelligibility and that could potentially be constrained to a small number of options -- notably, number separators and number patterns. Support for a commonly used subset of these options could be possible.  
