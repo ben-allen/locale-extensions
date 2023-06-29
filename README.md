@@ -48,7 +48,7 @@ In the native environment these problems do not occur, since users can specify t
 
 Unicode Extensions for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
 
-1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale that is confusing and unfamiliar to users from regions that use Celcius. 
+1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale that is confusing and unfamiliar to users from regions that use Celsius. 
 
 2. In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar. 
 
@@ -74,7 +74,8 @@ The following table suggests a minimal set of commonly used locale extensions to
 
 ## Agent-Driven Negotiation: JavaScript API 
 
-The locale extensions preferred by the user should be exposed as JavaScript APIs via `navigator.locales`, or by creating a new `navigator.localeExtensions` property. 
+
+We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
 
 ### IDL 
 
