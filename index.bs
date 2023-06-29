@@ -8,11 +8,9 @@ Repository: ben-allen/locale-extensions
 URL: https://github.com/ben-allen/locale-extensions
 Editor: Ben Allen, Igalia, https://igalia.com, benallen@igalia.com
 !Tests: 
-Abstract: This specification introduces a Client Hints header and a homologous JavaScript API that will allow the use of a subset of Unicode Extensions for BCP 47 to tailor content. This will allow web platform developers to improve the accessibility and usability of web applications.
+Abstract: This specification defines a mechanism for making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements. It provides a JavaScript API and a corresponding set of Client Hints.
 Markup Shorthands: markdown yes
-
 </pre>
-
 
 
 <pre class=biblio>
@@ -60,6 +58,8 @@ urlPrefix: https://datatracker.ietf.org/doc/html/rfc8942
 Introduction {#introduction}
 =====
 
+This proposal defines a mechanism by making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
+
 [=Unicode Extensions for BCP 47=] can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
 
 >Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius.
@@ -70,11 +70,27 @@ For **client-side applications**, the best way to get these preferences is throu
 
 For **server-side applications**, one way to access this information is through the use of a [[!CLIENT-HINTS]] header on the request signalling that Unicode Extensions are to be used.  
 
+In both of these cases the browser conveys data related to the user's operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings having at most three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an `Accept-CH` header or else issue a detectable query to the client.
+
+Proposed Minimal Set of Unicode Locale Extensions {#locale-extensions-minimal-set}
+====================
+
+The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
+
+<table>
+  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>Preferred hour cycle</tr>
+  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celcius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
+  <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
+</table>
+
+
+> Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders. 
 
 Locale Extension Features {#locale-extensions-features}
 ====================
 
-We propose to address the above uses cases by using a [[!CLIENT-HINTS]] header and a homologous [[#javascript-api]]. Both will be responsible for exposing and negotiating the exchange of desired tailorings. We define a new standard <dfn export>`Locale-Extensions`</dfn> Client Hint and <dfn for='NavigatorLocaleExtensions' export>`navigator.localeExtensions`</dfn>, mapping locale settings using the following steps: 
+We address the above uses cases by defining a [[#javascript-api]] and a corresponding  [[!CLIENT-HINTS]] header]. Both will be responsible for exposing and negotiating the exchange of desired tailorings. We define <dfn for='NavigatorLocaleExtensions' export>`navigator.localeExtensions`</dfn>, and a new set of <dfn export>`Locale-Extensions`</dfn> Client Hints, both of which map locale settings using the following steps: 
 
 1. Validate that specific locale extensions are allowed to be exposed.
 2. Read the available OS tailorings
