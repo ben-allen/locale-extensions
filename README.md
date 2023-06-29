@@ -64,7 +64,7 @@ The following table suggests a minimal set of commonly used locale extensions to
 <table>
   <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>Preferred hour cycle</tr>
   <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celsius`, `fahrenheit`, `auto`<td>Measurement unit for temperature</tr>
+  <tr><td>"measurementUnit"<td>`mu`<td>`celsius`, `fahrenhe`, `auto`<td>Measurement unit for temperature</tr>
   <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
 </table>
 
