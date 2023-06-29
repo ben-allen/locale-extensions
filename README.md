@@ -37,7 +37,7 @@ On the Web platform, content is localized dependent only upon a user's language 
 
 Some example situations:
 
-1. Someone traveling overseas sees temperatures in Fahrenheit even though they are more familiar with Censius.
+1. Someone traveling overseas sees temperatures in Fahrenheit even though they are more familiar with Celsius.
 2. Someone is more familiar with 12-hour time, but Intl.DateTimeFormat is rendering 24-hour time.
 3. Someone sets their language dialect to one they can understand, but they prefer dates, times, and numbers to be rendered according to local standards.
 4. Someone sees digits in a numbering system in an unfamiliar writing system.
