@@ -18,8 +18,6 @@ Explainer: Locale Extensions
   - [Privacy and Security Considerations](#privacy-and-security-considerations)
   - [FAQ](#faq)
 
-#proactive-content-negotiation-with-client-hints#
-
 ## Authors:
 
 - [Romulo Cintra](https://github.com/romulocintra)
