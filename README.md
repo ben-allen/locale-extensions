@@ -40,7 +40,7 @@ Some example situations:
 1. Someone traveling overseas sees temperatures in Fahrenheit even though they are more familiar with Celsius.
 2. Someone is more familiar with 12-hour time, but Intl.DateTimeFormat is rendering 24-hour time.
 3. Someone sets their language dialect to one they can understand, but they prefer dates, times, and numbers to be rendered according to local standards.
-4. Someone sees digits in a numbering system in an unfamiliar writing system.
+4. Someone sees digits in an unfamiliar writing system.
 
 In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, the full amount of flexibility allowed for in the native environment is not possible in the web environment. This proposal defines a mechanism for making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
 
