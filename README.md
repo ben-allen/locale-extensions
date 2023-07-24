@@ -10,7 +10,6 @@ Explainer: Locale Extensions
   - [Overview](#overview)
   - [Common Locale Extensions](#common-locale-extensions)
   - [JavaScript API](#agent-driven-negotiation-javascript-api)
-      - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
   - [Client Hints](#proactive-content-negotiation-with-client-hints) 
       - [`Client Hint` Header Fields](#client-hint-header-fields)
