@@ -10,7 +10,6 @@ Explainer: Locale Extensions
   - [Overview](#overview)
   - [Common Locale Extensions](#common-locale-extensions)
   - [JavaScript API](#agent-driven-negotiation-javascript-api)
-      - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
   - [Client Hints](#proactive-content-negotiation-with-client-hints) 
       - [`Client Hint` Header Fields](#client-hint-header-fields)
@@ -73,15 +72,23 @@ The following table suggests a minimal set of commonly used locale extensions to
 ## Agent-Driven Negotiation: JavaScript API 
 
 
-We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
+We expose the locale extension string for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
 
 ### IDL 
 
+
 ```
 interface LocaleExtensions {
-  readonly attribute DOMString measurementUnit;
-  readonly attribute DOMString numberingSystem;
-  readonly attribute DOMString hourCycle;
+
+
+}
+
+
+```
+
+```
+interface LocaleExtensions {
+  readonly attribute DOMString localeExtensions;
 };
 
 interface mixin NavigatorLocaleExtensions {
@@ -96,20 +103,10 @@ WorkerNavigator includes NavigatorLocaleExtensions;
 
 ```js
 
-navigator.localeExtensions['numberingSystem'];
-navigator.localeExtensions.numberingSystem;
-self.navigator.localeExtensions.numberingSystem;
-// Output => => "latn"
-
-navigator.localeExtensions['measurementUnit'];
-navigator.localeExtensions.measurementUnit;
-self.navigator.localeExtensions.measurementUnit;
-// Output => => "celsius"
-
-navigator.localeExtensions['hourCycle'];
-navigator.localeExtensions.hourCycle;
-self.navigator.localeExtensions.hourCycle;
-// Output => => "h12"
+navigator.localeExtensions['localeExtensions'];
+navigator.localeExtensions.localeExtensions;
+self.navigator.localeExtensions
+// "-u-fw-mon-hc-h24-mu-celsius"
 
 // Window or WorkerGlobalScope event
 
