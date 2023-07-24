@@ -10,7 +10,6 @@ Explainer: Locale Extensions
   - [Overview](#overview)
   - [Common Locale Extensions](#common-locale-extensions)
   - [JavaScript API](#agent-driven-negotiation-javascript-api)
-      - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
   - [Client Hints](#proactive-content-negotiation-with-client-hints) 
       - [`Client Hint` Header Fields](#client-hint-header-fields)
@@ -74,23 +73,6 @@ The following table suggests a minimal set of commonly used locale extensions to
 
 
 We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
-
-### IDL 
-
-```
-dictionary LocaleExtensions {
-  DOMString measurementUnit;
-  DOMString numberingSystem;
-  DOMString hourCycle;
-};
-
-interface mixin NavigatorLocaleExtensions {
-  readonly attribute LocaleExtensions localeExtensions;
-};
-
-Navigator includes NavigatorLocaleExtensions;
-WorkerNavigator includes NavigatorLocaleExtensions;
-```
 
 ### Proposed Syntax
 
