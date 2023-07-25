@@ -173,10 +173,10 @@ These client hints should also be exposed as JavaScript APIs via `navigator.loca
 <pre class="idl">
 
 ```
-dictionary LocaleExtensions {
-  DOMString measurementUnit;
-  DOMString numberingSystem;
-  DOMString hourCycle;
+interface LocaleExtensions {
+  readonly attribute DOMString measurementUnit;
+  readonly attribute DOMString numberingSystem;
+  readonly attribute DOMString hourCycle;
 };
 
 interface mixin NavigatorLocaleExtensions {
