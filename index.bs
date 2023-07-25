@@ -168,6 +168,27 @@ Note that servers **must** ignore hints that they do not support.
 
 These client hints should also be exposed as JavaScript APIs via `navigator.locales` as suggested in [#68](https://github.com/tc39/ecma402/issues/68), or by creating a new `navigator.localeExtensions` property:
 
+### IDL ### {#locale-extensions-javascript-idl} 
+
+<pre class="idl">
+
+```
+interface LocaleExtensions {
+  readonly attribute DOMString measurementUnit;
+  readonly attribute DOMString numberingSystem;
+  readonly attribute DOMString hourCycle;
+};
+
+interface mixin NavigatorLocaleExtensions {
+  readonly attribute LocaleExtensions localeExtensions;
+};
+
+Navigator includes NavigatorLocaleExtensions;
+WorkerNavigator includes NavigatorLocaleExtensions;
+```
+
+</pre>
+
 ### Proposed Syntax ### {#user-locale-extensions-javascript-api-proposed-syntax}
 <div class=example>
 ```js

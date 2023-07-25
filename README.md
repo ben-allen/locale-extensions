@@ -74,6 +74,24 @@ The following table suggests a minimal set of commonly used locale extensions to
 
 We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
 
+
+### IDL 
+
+```
+interface LocaleExtensions {
+  readonly attribute DOMString measurementUnit;
+  readonly attribute DOMString numberingSystem;
+  readonly attribute DOMString hourCycle;
+};
+
+interface mixin NavigatorLocaleExtensions {
+  readonly attribute LocaleExtensions localeExtensions;
+};
+
+Navigator includes NavigatorLocaleExtensions;
+WorkerNavigator includes NavigatorLocaleExtensions;
+```
+
 ### Proposed Syntax
 
 ```js
