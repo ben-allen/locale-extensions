@@ -78,10 +78,10 @@ We expose the preferred options for these extensions in a JavaScript API via `na
 ### IDL 
 
 ```
-dictionary LocaleExtensions {
-  DOMString measurementUnit;
-  DOMString numberingSystem;
-  DOMString hourCycle;
+interface LocaleExtensions {
+  readonly attribute DOMString measurementUnit;
+  readonly attribute DOMString numberingSystem;
+  readonly attribute DOMString hourCycle;
 };
 
 interface mixin NavigatorLocaleExtensions {
