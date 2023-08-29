@@ -1,26 +1,8 @@
-Explainer: Locale Extensions 
-
-## Table of Contents
-
-- [Explainer:  Locale Extensions](#explainer-locale-extensions)
-  - [Table of Contents](#table-of-contents)
-  - [Authors](#authors)
-  - [Participate](#participate)
-  - [Motivation](#motivation)
-  - [Overview](#overview)
-  - [Common Locale Extensions](#common-locale-extensions)
-  - [JavaScript API](#agent-driven-negotiation-javascript-api)
-      - [Proposed Syntax](#proposed-syntax)
-  - [Client Hints](#proactive-content-negotiation-with-client-hints) 
-      - [`Client Hint` Header Fields](#client-hint-header-fields)
-      - [Usage Example](#usage-example)
-  - [Privacy and Security Considerations](#privacy-and-security-considerations)
-  - [FAQ](#faq)
+explainer: Locale Preferences
+---
 
 ## Authors:
 
-- [Romulo Cintra](https://github.com/romulocintra)
-- [Ujjwal Sharma](https://github.com/ryzokuken)
 - [Ben Allen](https://github.com/ben-allen)
 
 ## Participate
@@ -30,65 +12,83 @@ Explainer: Locale Extensions
 
 ## Motivation
 
-On the Web platform, content is localized dependent only upon a user's language or region. However, this behavior can result in annoyance, frustration, offense, or even uninteligibility for some users.
+On the Web platform, content localization is dependent only upon a user's language or region. However, this behavior can result in annoyance, frustration, offense, or even unintelligibility for some users. This proposal addresses common cases where users prefer locale-related tailorings that differ from the defaults in their locale. Consider the following problems:
 
-Some example situations:
+1. A Spanish-speaking person from the United States has moved to Spain, and would prefer if local news sites would display weather forecasts using temperatures measured in Fahrenheit rather than Celsius.
+2. An English-speaking user from Japan receives non-localized content in 'en'. They can read English, but nevertheless prefer seeing a 24-hour clock and calendars that have Monday, rather than Sunday, as the first day of the week. 
+3. In general, 'en-US' is currently the typical untranslated language for software, even though 'en-US' has region-specific formatting patterns that differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures and times represented in globally uncommon scales.
+4. A user who has emigrated from one country to another sets their language dialect to one they can understand, but prefers that dates, times, and numbers be rendered according to local standards.
+5. In some geographical regions multiple numbering systems are in use. For example, both Western Arabic (Latin) and Eastern Arabic numerals are in common use in Iran and Afghanistan. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and therefore desire content tailored to the numbering system with which they are most familiar.
+6. Western Arabic (Latin) numerals are used by default in 'hi-IN', even though many users find Devanāgarī numerals more intelligible.
 
-1. Someone traveling overseas sees temperatures in Fahrenheit even though they are more familiar with Celsius.
-2. Someone is more familiar with 12-hour time, but Intl.DateTimeFormat is rendering 24-hour time.
-3. Someone sets their language dialect to one they can understand, but they prefer dates, times, and numbers to be rendered according to local standards.
-4. Someone sees digits in an unfamiliar writing system.
+In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, offering the full amount of flexibility allowed in the native environment is not possible in the often hostile web environment &mdash; if a user's preferences as specified in their OS settings are at all uncommon, servers can use them to fingerprint that user.
 
-In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, the full amount of flexibility allowed for in the native environment is not possible in the web environment. This proposal defines a mechanism for making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.
+This proposal defines a mechanism to let clients to read user preferences from their operating system and then relay a subset of those preferences to servers, while refraining from sending combinations of preferences that are likely to individuate those users.  This allows for significantly more complete &mdash; but not necessarily perfect &mdash; localization while only exposing relatively coarse-grained data about users. 
 
 ## Overview 
 
-Unicode Extensions for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:
-
-1. Currently en-US is the typical untranslated language for software, even though en-US's region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale that is confusing and unfamiliar to users from regions that use Celsius. 
-
-2. In many regions both Latin and Arabic-Indic numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar. 
+Unicode Extensions for BCP 47 can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones above.
 
 For **client-side applications**, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs. 
 
-For **server-side applications**, one way to access this information is through the use of a Client Hints header on the request, signalling that Unicode Locale Extensions are to be used. 
+For **server-side applications**, one way to access this information is through the use of a `Client Hints` header on the request, signalling that Unicode Locale Extensions are to be used. 
 
-In both of these cases the browser conveys data related to the user's operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings having at most three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an `Accept-CH` header or else issue a detectable query to the client.
+Both of these mechanisms allow servers to receive data related to the user's operating system preferences. However, we do not expose *all* of the user's preferences. Instead, we determine what combinations of specific settings are in common use in each given locale, and only expose preferences that can be fit into one of those commonly-used combinations. This allows for significantly improved content tailoring, without exposing the type of relatively uncommon combinations of preferences that would allow servers to easily individuate users.
 
-### Common Locale Extensions
-The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive &mdash; limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.
+### Example Problem #1 and Proposed Solution 
 
-<table>
-  <tr><td>"hourCycle"<td>`hc`<td>`h12`, `h23`, `auto`<td>Preferred hour cycle</tr>
-  <tr><td>"numberingSystem"<td>`nu`<td>`latn`, `native`, `auto`<td>Preferred numbering system</tr>
-  <tr><td>"measurementUnit"<td>`mu`<td>`celsius`, `fahrenhe`, `auto`<td>Measurement unit for temperature</tr>
-  <thead><tr><th>Locale Extension Name<th>Unicode Extension Key<th>Possible values<th>Description</thead>
-</table>
+Consider the case of a student from the Netherlands who is spending a year at a university in Chicago. This student is likely a native-level English speaker, but could avoid annoyance and potential error if the university's course catalog displayed times on a 24 hour cycle instead of using the 12 hour clock common in the United States, and would likewise prefer if calendars be displayed with Monday, rather than Sunday, as the first day of the week. Additionally, they are not acclimated to Chicago's extreme winters, and use the weather display on a local news site to determine how many layers of clothes to wear. They would very much like to avoid the frustration and potential for mishap involved in converting temperatures from the unfamiliar Fahrenheit scale to the immediately comprehensible Celsius scale. 
+
+It is possible to express this set of preferences using Unicode Locale Extension tags: 
+
+'-u-fw-mon-hc-h23-mu-celsius'
+
+Our example user's native applications read their preferences from the operating system and display dates, times, and temperatures, but user preferences are (wisely) shielded from potentially hostile web applications.
+
+Nevertheless, if our hypothetical student were able to send this particular set of preferences to web sites, they likely could not be used to individuate them.  After all, those preferences are common across Europe and much of the globe, and so it is likely that there are sufficient other users who share our hypothetical student's preferences that none of the members of this group can be distinguished from any other in the group through inspection of these preferences. 
+
+As our aim is to improve content localization, we can safely ignore highly idiosyncratic settings. For example, if a user's preferences as read from the operating system can be described by the locale extension string 'u-ca-dangi-hc-h11-mu-kelvin', meaning "give me the traditional Korean calendar, a clock that runs from 0 to 11, and temperatures in Kelvin," allowing servers to see those preferences would immediately make that user individually identifiable. Fortunately, there is no internationalization-related reason that we should accommodate that very rare combination of settings, and so we can safely disallow it.
 
 
-> Note: The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders. 
+#### Why not -u-rg?
 
+Unicode Locale Extensions provides the -u-rg Region Override tag, which is used to represent a locale modified with region-specific defaults from another locale. For example, 'en-GB-u-rg-uszzzz' means British English, but with hour cycle, first day of week, measurement system, and so forth set as in 'en-US'. This is, unfortunately, not particularly well-adapted for our purposes: saying '-u-rg-nlzzzz' is in a way equivalent to saying '-u-fw-mon-hc-h23-mu-celsius', but with the disadvantage that '-u-rg-nlzzzz' reveals that the user prefers the formatting in specifically 'nl'. This exposes significantly more information about the user than if they were instead able to select the set of preferences that match those used in 'nl' &mdash; a set of preferences that are found in many locales &mdash; without revealing that the user specifically desires content tailored as in 'nl'.
+
+Moreover, a system that explicitly specifies each setting rather than naming a region and requesting the defaults for that region allows us to accommodate the preferences of users who have system settings that differ from the defaults for their language/region pair. Consider the case of a user living in a region with multiple commonly used numbering systems. There may not exist any non-extended locale identifier that captures this preference, but there may also be a sufficiently large group of users who have selected the non-default numbering system that they are all in a large enough anonymity set. Solutions involving -u-rg do not allow these users to specify this preference. 
+
+
+### A More Difficult Example
+
+It is possible that our hypothetical Dutch student could have their entire set of locale-related preferences honored while in 'en-US', due to the relatively large number of other people in that locale who also prefer '-u-fw-mon-hc-h23-mu-celsius'.  However, users from locales with less common combinations of default locale-related content tailoring settings cannot count on having a similar crowd to hide in. For example, a businessperson from Thailand visiting Finland may prefer something like '-u-ca-buddhist-fw-mon-hc-h23-mu-celsius'. Although many of these options are shared by a significant number of other people, the request for the Thai solar calendar rather than the Gregorian calendar is sufficiently rare in the 'fi' locale that it may be possible to individuate that user from that setting alone. This means that we cannot safely set this full combination of options for this user. Nevertheless, we would like to provide them with content tailored to as many of their preferences as possible.
+
+#### Locale Preference Strings
+
+We propose the following broad-strokes approach for accomodating as many of the user's preferences as possible while revealing as little information about them as possible:
+
+* Each locale must allow the use of some number of locale extension strings, with the number and selection of available locale extension strings dependent upon demand for that combination of settings. If a significant number of users prefer a particular locale extension string , it is possible to allow access to that combination of settings while still allowing users to maintain a sufficiently large anonymity set. 
+
+* These locale extension strings are selected to, insofar as is possible, honor at least some part of the preferences of users from any locale. Users whose preferences are rare enough that expressing them in full would likely make them individuatable can be assigned a locale extension string that comes as close as possible to expressing their full preferences while exposing them to as little risk as possible. A user reading 'en-US' content who nevertheless prefers content tailorings as in 'th' could get most (but not all) of their preferences met by assigning them the locale extension string '-u-fw-mon-hc-h23-mu-celsius', even if their request for ca-buddhist could not be met.
+
+* User preferences read from the operating system are compared to the set of available locale extension strings, and only those preferences expressible through one of those strings or a subset of one of those strings are exposed to servers. Client behaviour that allows users to select locale preferences beyond those in the set of valid strings is considered non-normative. 
+
+Care must be taken in the construction of the set of valid locale extension strings. Most notably, ignoring some preferences can be annoying to users, but ignoring others (for example, preferred numbering system) can result in some users receiving unintelligible content. Preferences must therefore receive different weights, based on the likelihood that content will become unintelligible if that preference is ignored. Most notably, there are a number of locales in which numbering systems differing from the locale default are commonly used. In these locales support for locale extension strings requesting use of those commonly used alternate numbering systems is paramount. 
+
+The set of available locale extension strings must be individually constructed for each base locale, since the likely combinations of locale-related alternate preferences will vary from locale to locale. To use the 'th' example, it is possible that locales with regional or cultural connections to Thailand would in fact have enough users who prefer the Thai solar calendar for `ca-buddhist` to appear in one or more locale extension strings. 
 
 ## Agent-Driven Negotiation: JavaScript API 
 
-
-We expose the locale extension string for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property: 
-
 ### IDL 
+We expose the preferred options for these extensions in a JavaScript API via 'navigator.locales' or by creating a new 'navigator.localeExtensions' property: 
 
-
-```
-interface LocaleExtensions {
-
-
-}
-
+### IDL
 
 ```
-
-```
-interface LocaleExtensions {
-  readonly attribute DOMString localeExtensions;
+interface LocaleExtensions localeExtensions {
+  readonly attribute DOMString calendar;
+  readonly attribute DOMString firstDayOfWeek;
+  readonly attribute DOMString hourCycle;
+  readonly attribute DOMString temperatureUnit;
+  readonly attribute DOMString numberingSystem;
 };
 
 interface mixin NavigatorLocaleExtensions {
@@ -103,10 +103,10 @@ WorkerNavigator includes NavigatorLocaleExtensions;
 
 ```js
 
-navigator.localeExtensions['localeExtensions'];
-navigator.localeExtensions.localeExtensions;
-self.navigator.localeExtensions
-// "-u-fw-mon-hc-h24-mu-celsius"
+navigator.localeExtensions['numberingSystem'];
+navigator.localeExtensions.numberingSystem;
+self.navigator.numberingSystem;
+// "deva"
 
 // Window or WorkerGlobalScope event
 
@@ -122,29 +122,34 @@ window.addEventListener('localeextensions', () => {
 
 ```
 
-
 ## Proactive Content Negotiation With Client Hints ##
 
-An <a href="https://datatracker.ietf.org/doc/rfc8942/">HTTP Client Hint</a> is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request. 
+An <a href="https://datatracker.ietf.org/doc/rfc8942/">HTTP Client Hint</a> is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an `Accept-CH` response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request.
 
-Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for hostile passive fingerprinting that arise when using other means for proactive content negotiation (for example, the `User-Agent` string). 
+Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for hostile passive fingerprinting that arise when using other means for proactive content negotiation (for example, the `User-Agent` string).
 
 
 ### `Client Hint` Header Fields
 
-Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with their preferred content tailorings. 
+Servers cannot passively receive information about locale extension-related settings. Servers instead announce their ability to use extensions, allowing clients the option to respond with their preferred content tailorings.
 
 To accomplish this, browsers should introduce new `Client Hint` header fields as part of a structured header as defined in <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-19">Structured Field Values for HTTP</a>.
 
 <table>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Hour-Cycle`</dfn><td>`Sec-CH-Locale-Extensions-Hour-Cycle`  : "h23"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Numbering-System`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "native"</tr>
-  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "auto"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-Calendar`</dfn><td>`Sec-CH-Locale-Extensions-Calendar`  : "gregory"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-FirstDay`</dfn><td>`Sec-CH-Locale-Extensions-FirstDay`  : "mon"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-HourCycle`</dfn><td>`Sec-CH-Locale-Extensions-HourCycle`  : "h23"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-MeasurementUnit`</dfn><td>`Sec-CH-Locale-Extensions-MeasurementUnit` : "fahrenhe"</tr>
+  <tr><td><dfn export>`Sec-CH-Locale-Extensions-NumberingSystem`</dfn><td>`Sec-CH-Locale-Extensions-NumberingSystem`  : "deva"</tr>
 
   <thead><tr><th style=text:align left>Client Hint<th>Example output</thead>
 </table>
 
-The `Sec-` prefix used on these headers prevents scripts and other application content from setting them in user agents, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. See [HTTP Client Hints Section 4.2, Deployment and Security Risks](https://datatracker.ietf.org/doc/html/rfc8942#section-4.2) for more information. 
+Designing the Client Hint header fields requires a tradeoff between fingerprinting mitigation and using a parsimonious set of headers. The approach that best prevents fingerprinting is to give each separate tag its own Client Hint header. Since servers must advertise their use of each header, fully separating the tags makes fingerprinting attempts more obvious &mdash;  a server that requests a large number of Client Hints without need is broadcasting its potential intent to use the information gathered from the client for the purpose of fingerprinting. However, if header bloat becomes a primary concern, some of these headers can be grouped. For example, `hc`, `fw` and `ca` could be grouped together as preferences related to date and time, or `fw`, `hc`, and `mu` could be grouped due not to conceptual similarity but instead to how they are strongly correlated with each other, as users following United States regional standards are likely to want `-u-fw-sun-hc-h12-mu-fahrenhe` while users in much of the rest of the world are likely to want `-u-fw-mon-hc-h23-mu-celsius`. 
+
+Should the ability to customize settings beyond those expressible through BCP 47 tags become incorporated into this proposal, grouping will necessarily become a more pressing concern. For example, should additional preferences related to number formatting become part of the proposal, these could be grouped together with `nu`. 
+
+The `Sec-` prefix used on these headers prevents scripts and other application content from setting them in user agents, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. See [HTTP Client Hints Section 4.2, Deployment and Security Risks](https://datatracker.ietf.org/doc/html/rfc8942#section-4.2) for more information.
 
 ### Usage Example
 
@@ -157,7 +162,7 @@ GET / HTTP/1.1
 Host: example.com
 ```
 
-2. The server responds, sending along with the initial response an `Accept-CH` header (see [HTTP Client Hints Section 3.1, The `Accept-CH` Response Header Field](https://datatracker.ietf.org/doc/html/rfc8942#section-3.1)) with `Sec-CH-Locale-Extensions-NumberingSystem`. This response indicates that the server accepts that particular Client Hint and no others. 
+2. The server responds, sending along with the initial response an `Accept-CH` header (see [HTTP Client Hints Section 3.1, The `Accept-CH` Response Header Field](https://datatracker.ietf.org/doc/html/rfc8942#section-3.1)) with `Sec-CH-Locale-Extensions-NumberingSystem`. This response indicates that the server accepts that particular Client Hint and no others.
 
 ```http
 HTTP/1.1 200 OK
@@ -165,75 +170,54 @@ Content-Type: text/html
 Accept-CH: Sec-CH-Locale-Extensions-NumberingSystem
 ```
 
-3. Subsequent requests to https://example.com will include the following request headers in case the user agent sets `numberingSystem`.
+3. If the user's preferred numbering system differs from the defaults for the locale &mdash; in this case, the user prefers Devanāgarī numerals &mdash; subsequent requests to https://example.com will include the following request headers.
 
 ```http
 GET / HTTP/1.1
 Host: example.com
-Sec-CH-Locale-Extensions-NumberingSystem: "native" 
+Sec-CH-Locale-Extensions-NumberingSystem: "deva"
 ```
 
-4. The server can then tailor the response accordingly. For example, if the current locale is `hi-IN`, the server could provide content with numbers represented using Devanagari numerals. 
+4. The server can then tailor the response accordingly. 
 
-Note that servers **must** ignore hints that they do not support. 
+Note that servers **must** ignore hints that they do not support. Note also that although each of the locale extension preferences can be accessed individually, no `Client Hint` can be sent unless it is consistent with one of the valid locale extension strings for the content's locale.
 </div>
+
 
 ## Privacy and Security Considerations
 
 There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content accessible to and usable by people from as wide a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, since content negotiation necessarily requires revealing information about users.
 
-The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation: 
+The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#fingerprinting-mitigation-levels-of-success) W3C document identifies the following key elements for fingerprint mitigation:
 
 1. Decreasing the fingerprinting surface
 2. Increasing the anonymity set
-3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones) 
+3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones)
 4. Clearable local state
 
-The preservation of a relatively large anonymity set is our central strategy for mitigating fingerprinting risk as much as possible while also ensuring a substantial improvement in the localization experience for a wide range of users. 
-
-* 'hourCycle' always provides users with both of the most commonly used hour cycles plus their region's default, should that default differ from "h12" and "h23", while protecting users from making themselves immediately individually indentifiable by revealing that they use a particularly uncommon hour cycle for their region.
-* 'measurementUnit' already allows only three options.
-* 'numberingSystem' has its set of available options limited to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, with the most potential options offered to users in language/region pairs that have a "native" numbering system and also a "default" numbering system that differs from both the "native" numbering system and from "latn". This compromise allows as many users as possible the ability to specify an intelligible numbering system, without allowing for selections that are likely to immediately uniquely identify users. 
+The preservation of a relatively large anonymity set for all users is our central strategy for mitigating fingerprinting risk as much as possible while also ensuring a substantial improvement in the localization experience for a wide range of users. Rather than increasing the fingerprinting attack surface, this proposal could in fact help *reduce* the fingerprinting surface as a whole by providing a mechanism to get many of the benefits of the 'Accept-Language' header without that header's passive fingerprinting implications.
 
 As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, because servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice. In the absence of Client Hints, use of the JavaScript API can at least be detected by clients. In no case does this proposal allow for any new passive fingerprinting vectors. 
 
-The use of the `Sec-` prefix forbids access to headers containing `Locale Extensions` information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
+The use of the 'Sec-' prefix forbids access to headers containing 'Locale Extensions' information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. 
 
 As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.
-
-Implementations may also include additional fingerprinting mitigations. For example, clients could restrict the number of Locale Extension settings sent by users who already have a small anonymity set, either because of other information exposed by the client or because of being in a language/region pair with relatively fewer users. In this case preference would be given to always sending those headers most likely to impact content intelligibility. This ensures that as many users as possible can take advantage of crucial localization settings without making themselves individually identifiable. Additionally, user agents can make decisions about what to reveal to what sites; cross-origin sites, for example, could be allowed access to less data than top-level sites the user visits frequently. 
-
-This proposal could help reduce the fingerprinting surface as a whole by providing a mechanism to get many of the benefits of the `Accept-Language` header without that header's passive fingerprinting implications.
 
 
 ## FAQ
 
-### Why this specific selection of tags?
-
-We've selected a best-guess set of tags and available options for those tags based on the following criteria:
-
-1. Would revealing OS settings related to this tag result in major intelligibility benefits for users?
-2. Would revealing OS settings related to this tag result in the reduction of annoyances for a large group of users?
-3. Can we approach these goals while only revealing relatively coarse-grained information about users?
-
-There are additional tags which can be considered: for example, `fw` is a candidate, presumably with valid options limited to the first day of week options most commonly used. `ms` would be a strong candidate, were it not slated to be deprecated. 
-
-User research may be useful in determining what sets of tags are best for negotiating the balance between more precise content tailorings and potential fingerprinting risks.
 
 ### What about clients that don't implement Client Hints?
 
-Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general &mdash; the extra request required, etc. 
+Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general — the extra request required, etc.
+
 
 ### Maintaining a large anonymity set for users in smaller language/region pairs?
 
-A user of `en-US` or `zh-CN` is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. This leads to the unpleasant conclusion that mitigating fingerprint risk may require allowing users of common language/region pairs significantly more control over their desired content tailorings than users of less common ones. Should it prove necessary to provide these users fewer options, preference should be given to the locale extensions that are most likely to directly affect content intelligibility.
+A user viewing content in 'en-US' or 'zh-CN' is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. Locale preferences for content in less commonly-used locales will be less likely to be honored, unless those preferences reflect either a globally common set of preferences (for example, '-u-fw-mon-hc-h23-mu-celsius' or -u-fw-sun-hc-h12-mu-fahrenhe') or a common local preference (as in preferring '-u-nu-deva' instead of -u-nu-latn' in 'hi-IN'). This restriction is unfortunate, but may be unavoidable.
 
-### Alternate strategies to consider?
-
-An alternate strategy for determining what options are available may involve allowing option selections that tend to correlate with each other (for example, the use of "h23" for hour cycle and "celsius" for measurement unit) to be set together, but not separately. User research would be required to determine the most needed sets of commonly-seen-together selections. 
-
-One way to implement bundles of preferences that tend to track together may be to implement commonly used values for the `rg` Unicode Extension. This could allow users to (for example) set their locales to "en-US-u-rg-gbzzzz", which would result in content in US English but with region-specific defaults set to those of British English. 
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
-There exist other localization-related customizations that would be useful for site intelligibility and that could potentially be constrained to a small number of options -- notably, number separators and number patterns. Support for a commonly used subset of these options could be possible.  
+There exist other localization-related customizations that would be useful for site intelligibility - most notably, number separators and number patterns. Support for a commonly used subset of these options could be possible, particularly in cases where they strongly correlate with a particular combination of Unicode Extensions for BCP 47.
+
