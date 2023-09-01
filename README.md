@@ -1,4 +1,4 @@
-explainer: Locale Preferences
+explainer: Locale Extensions
 ---
 
 ## Authors:
