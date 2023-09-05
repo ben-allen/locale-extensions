@@ -257,4 +257,6 @@ A conservative approach should be taken in adding and especially in removing ava
 
 ### How many possible locale extension strings will be supported in each locale?
 
-Answering this question responsibly will require user research. It is possible that many varied sets of preferences are safely expressible in many locales, and it is also possible that most locales might only support '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-12-mu-fahrenhe', plus whatever values for the `nu` key are common in that locale. Note, though, that even if only the minimal case could be supported, this would nevertheless substantially improve the experience of the Web for many users.
+Answering this question responsibly will require user research. It is possible that many varied sets of preferences are safely expressible in many locales, and it is also possible that most locales might only support '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-12-mu-fahrenhe', plus whatever values for the `nu` key are common in that locale. 
+
+Note, though, that even if only the minimal case could be supported, this would nevertheless substantially improve the experience of the Web for many users.
