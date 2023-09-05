@@ -72,12 +72,12 @@ As our aim is to improve content localization, we can safely ignore highly idios
 
 Unicode Locale Extensions provides the -u-rg Region Override tag, which is used to represent a locale modified with region-specific defaults from another locale. For example, 'en-GB-u-rg-uszzzz' means British English, but with hour cycle, first day of week, measurement system, and so forth set as in 'en-US'. This is, unfortunately, not particularly well-adapted for our purposes: saying '-u-rg-nlzzzz' is in a way equivalent to saying '-u-fw-mon-hc-h23-mu-celsius', but with the disadvantage that '-u-rg-nlzzzz' reveals that the user prefers the formatting in specifically 'nl'. This exposes significantly more information about the user than if they were instead able to select the set of preferences that match those used in 'nl' &mdash; a set of preferences that are found in many locales &mdash; without revealing that the user specifically desires content tailored as in 'nl'.
 
-Moreover, a system that explicitly specifies each setting rather than naming a region and requesting the defaults for that region allows us to accommodate the preferences of users who have system settings that differ from the defaults for their language/region pair. Consider the case of a user living in a region with multiple commonly used numbering systems. There may not exist any non-extended locale identifier that captures this preference, but there may also be a sufficiently large group of users who have selected the non-default numbering system that they are all in a large enough anonymity set. Solutions depending on -u-rg do not allow these users to specify this preference. 
+Moreover, a system that explicitly specifies each setting rather than naming a region and requesting the defaults for that region allows us to accommodate the preferences of users who have system settings that differ from the defaults for their language/region pair. Consider the case of a user living in a region with multiple commonly used numbering systems. There may not exist any non-extended locale identifier that captures their preference for a particular non-default numbering system, but there may be a sufficiently large group of users who would prefer receiving content using that numbering system that they are all in a large enough anonymity set. Solutions depending on -u-rg do not allow these users to specify this preference. 
 
 
 ### Example Problem #2
 
-It is possible that our hypothetical Dutch student could have their entire set of locale-related preferences honored while in 'en-US', due to the relatively large number of other people in that locale who also prefer '-u-fw-mon-hc-h23-mu-celsius'.  However, users from locales with less common combinations of default locale-related content tailoring settings cannot count on having a similar crowd to hide in. For example, a businessperson from Thailand visiting Finland may prefer something like '-u-ca-buddhist-fw-mon-hc-h23-mu-celsius'. Although many of these options are shared by a significant number of other people, the request for the Thai solar calendar rather than the Gregorian calendar is sufficiently rare in the 'fi' locale that it may be possible to individuate that user from that setting alone. This means that we cannot safely set this full combination of options for this user. Nevertheless, we would like to provide them with content tailored to as many of their preferences as possible.
+It is possible that our hypothetical European student could have their entire set of locale-related preferences honored while in 'en-US', due to the relatively large number of other people in that locale who also prefer '-u-fw-mon-hc-h23-mu-celsius'.  However, users from locales with less common combinations of default locale-related content tailoring settings cannot count on having a similar crowd to hide in. For example, a businessperson from Thailand visiting Mexico may prefer something like '-u-ca-buddhist-fw-mon-hc-h23'. Although two of these options are shared by a significant number of other people, the request for the Thai solar calendar rather than the Gregorian calendar is sufficiently rare in the 'es-MX' locale that it may be possible to individuate that user from that setting alone. This means that we cannot safely set this full combination of options for this user. Nevertheless, we would like to provide them with content tailored to as many of their preferences as possible.
 
 ### Solution: Locale Preference Strings
 
@@ -89,7 +89,7 @@ We propose the following broad-strokes approach for accomodating as many of the 
 
 * The set of available locale extension strings must be individually constructed for each base locale, since the likely combinations of locale-related alternate preferences will vary from locale to locale. To use the 'th' example, it is possible that locales with regional or cultural connections to Thailand would in fact have enough users who prefer the Thai solar calendar for 'ca-buddhist' to appear in one or more locale extension strings. Likewise, it is possible that locales with a very large number of users &mdash; for example, 'en-US' &mdash; have enough users who prefer 'ca-buddhist' for this option to become available.
 
-* User preferences read from the operating system are compared to the set of available locale extension strings, and only sends preferences that are expressible through one of the available locale extension strings. Client behaviour that convey user locale preferences beyond those in the set of valid strings is considered non-normative.
+* Clients read user preferences the operating system, and compare them to the set of available locale extension strings for the document's locale. The only preferences that servers see are those expressible through one of the available locale extension strings for that locale. Client behaviour that conveys user locale preferences beyond those in the set of valid strings is considered non-normative.
 
 * Clients that allow locale extension strings that, when used, are likely to reduce the user's anonymity set to shrink to a size such that the user may become easily individuatable are considered non-normative.
 
@@ -231,14 +231,13 @@ As in all uses of Client Hints, user agents must clear opt-in Client Hints setti
 
 Using Locale Extensions is still possible through the JavaScript API. Use of the API may present small drawbacks inherent to agent-side content negotiation in general — the extra request required, etc.
 
-
 ### Maintaining a large anonymity set for content in smaller language/region pairs?
 
 A user viewing content in 'en-US' or 'zh-CN' is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. Locale preferences for content in less commonly-used locales will be less likely to be honored, unless those preferences reflect either a globally common set of preferences (for example, '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-h12-mu-fahrenhe') or a common local preference (as in preferring '-u-nu-deva' instead of -u-nu-latn' in 'hi-IN'). This restriction is unfortunate, but may be unavoidable.
 
 ### Criteria for selecting available locale extension strings? 
 
-Determining the specific locale extension strings set for each region will require user research. It is possible that in many regions the only strings available will be `-u-fw-monday-hc-h23-mu-celsius` or possibly `-u-fw-sunday-hc-h12-mu-fahrenhe`, since the former corresponds to the most common settings globally and the latter corresponds to the most commonly used settings in the United States. However, it is likewise possible that many regions will allow a broader selection.
+Determining the specific locale extension strings set for each region will require user research. It is possible that in many regions the only strings available will be some subset of `-u-fw-monday-hc-h23-mu-celsius` or `-u-fw-sunday-hc-h12-mu-fahrenhe`.
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
@@ -246,4 +245,4 @@ There exist other localization-related customizations that would be useful for s
 
 ### Adding and removing additional locale extension strings
 
-A conservative approach should be taken in adding and especially in removing available locale extension strings, in order to avoid situations wherein (for example) users are unsure what scale a given temperature is in, or situations where a user who had previously been allowed to use their preferred numbering system no longer have access to it.
+A conservative approach should be taken in adding and especially in removing available locale extension strings. This is in order to avoid situations wherein (for example) users are unsure what scale a given temperature is in, or situations where a user who had previously been allowed to use their preferred numbering system no longer have access to it.
