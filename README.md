@@ -5,10 +5,11 @@
   - [Authors](#authors)
   - [Participate](#participate)
   - [Motivation](#motivation)
-  - [Example Problem #1 and Proposed Solution](#CHANGE-ME-TODO)
-    - [Why not -u-rg?](#common-locale-extensions)
-  - [Example Problem #2](#CHANGE-ME-TODO)
-    [Solution: Locale Preference Strings](#CHANGE-ME-TODO)
+  - [Overview](#overview)
+  - [Example Problem #1 and Proposed Solution](#example-problem-1-and-proposed-solution)
+    - [Why not -u-rg?](#why-not--u-rg)
+  - [Example Problem #2](#example-problem-2)
+    [Solution: Locale Preference Strings](#solution-locale-preference-strings)
   - [Agent-Driven Negotiation: JavaScript API](#agent-driven-negotiation-javascript-api)
       - [IDL](#idl)
       - [Proposed Syntax](#proposed-syntax)
@@ -235,8 +236,11 @@ Using Locale Extensions is still possible through the JavaScript API. Use of the
 
 A user viewing content in 'en-US' or 'zh-CN' is, all else being equal, going to be more anonymous than users of less-ubiquitous language/region pairs. As a result, it is significantly easier to provide a larger range of options to these users; even if we split them up into distinct smaller anonymity sets, it is still likely that they can hide in a crowd. Locale preferences for content in less commonly-used locales will be less likely to be honored, unless those preferences reflect either a globally common set of preferences (for example, '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-h12-mu-fahrenhe') or a common local preference (as in preferring '-u-nu-deva' instead of -u-nu-latn' in 'hi-IN'). This restriction is unfortunate, but may be unavoidable.
 
+### Criteria for selecting available locale extension strings? 
+
+Determining the specific locale extension strings set for each region will require user research. It is possible that in many regions the only strings available will be `-u-fw-monday-hc-h23-mu-celsius` or possibly `-u-fw-sunday-hc-h12-mu-fahrenhe`, since the former corresponds to the most common settings globally and the latter corresponds to the most commonly used settings in the United States. However, it is likewise possible that many regions will allow a broader selection.
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
-There exist other localization-related customizations that would be useful for site intelligibility - most notably, number separators and number patterns. Support for a commonly used subset of these options could be possible, particularly in cases where they strongly correlate with a particular combination of Unicode Extensions for BCP 47.
+There exist other localization-related customizations that would be useful for site intelligibility - most notably, number separators and number patterns. Support for a commonly used subset of these options could be possible, particularly in cases where they strongly correlate with a particular combination of valid lcale extension strings.
 
