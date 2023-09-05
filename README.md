@@ -257,4 +257,8 @@ A conservative approach should be taken in adding and especially in removing ava
 
 ### Will users be more likely to express their preferences when accessing content in commonly used locales than they are in less commonly used ones?
 
-Yes.
+Yes. More people from more regions are likely to have their preferences honored when visiting sites with content in 'en-US' and other very widely used locales than they are when accessing content in uncommon locales. 
+
+### How many possible locale extension strings will be supported in each locale?
+
+Answering this question responsibly will require user research. It is possible that many varied sets of preferences are safely expressible in many locales, and it is also possible that most locales might only support '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-12-mu-fahrenhe', plus whatever values for the `nu` key are common in that locale. Note, though, that even the minimal case would result in substantial improvement to the experience of the web. 
