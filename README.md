@@ -38,7 +38,7 @@ On the Web platform, content localization is dependent only upon a user's langua
 3. In general, 'en-US' is currently the typical untranslated language for software, even though 'en-US' has region-specific formatting patterns that differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures and times represented in globally uncommon scales.
 4. A user who has emigrated from one country to another sets their language dialect to one they can understand, but prefers that dates, times, and numbers be rendered according to local standards.
 5. In some geographical regions multiple numbering systems are in use. For example, both Western Arabic (Latin) and Eastern Arabic numerals are in common use in Iran and Afghanistan. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and therefore desire content tailored to the numbering system with which they are most familiar.
-6. Western Arabic (Latin) numerals are used by default in 'hi-IN', even though many users find Devanāgarī numerals more intelligible.
+6. Western Arabic (Latin) numerals are used by default in 'hi', even though many users find Devanāgarī numerals more intelligible.
 
 In the native environment these problems do not occur, since users can specify these desired customizations in their system settings. However, offering the full amount of flexibility allowed in the native environment is not possible in the often hostile web environment &mdash; if a user's preferences as specified in their OS settings are at all uncommon, servers can use them to fingerprint that user.
 
@@ -66,7 +66,7 @@ Our example user's native applications read their preferences from the operating
 
 Nevertheless, if our hypothetical student were able to send this particular set of preferences to web sites, they likely could not be used to individuate them.  After all, those preferences are common across Europe and much of the globe, and so it is likely that there are sufficient other users who share our hypothetical student's preferences that none of the members of this group can be distinguished from any other in the group through inspection of these preferences. 
 
-As our aim is to improve content localization, we can safely ignore highly idiosyncratic settings. For example, if a user's preferences as read from the operating system can be described by the locale extension string 'u-ca-dangi-hc-h11-mu-kelvin', meaning "give me the traditional Korean calendar, a clock that runs from 0 to 11, and temperatures in Kelvin," allowing servers to see those preferences would immediately make that user individually identifiable. Fortunately, there is no internationalization-related reason that we should accommodate that very rare combination of settings, and so we can safely disallow it.
+As our aim is to improve content localization, we can safely ignore highly idiosyncratic settings. For example, if a user's preferences as read from the operating system can be described by the locale extension string 'u-ca-dangi-hc-h11-mu-kelvin', meaning "give me the traditional Korean calendar, a clock that runs from 0 to 11, and temperatures in Kelvin", allowing servers to see those preferences would immediately make that user individually identifiable. Fortunately, there is no internationalization-related reason that we should accommodate that very rare combination of settings, and so we can safely disallow it.
 
 
 #### Why not -u-rg?
@@ -100,7 +100,7 @@ We propose the following broad-strokes approach for accomodating as many of the 
 
 ## Agent-Driven Negotiation: JavaScript API 
 
-We expose the preferred options for these extensions in a JavaScript API via 'navigator.locales' or by creating a new 'navigator.localeExtensions' property. Note that the API does not expose what locale extension string was selected, and requests for preferences must be made one-by-one. This constraint is in place as an additional fingerprinting mitigation measure &mdash; if scripts were allowed to fetch all preferences at once, it would be more difficult to detect active fingerprinting attempts.
+We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property. Note that the API does not expose what locale extension string was selected, and requests for preferences must be made one-by-one. This constraint is in place as an additional fingerprinting mitigation measure &mdash; if scripts were allowed to fetch all preferences at once, it would be more difficult to detect active fingerprinting attempts.
 
 Browsers carry out the following steps the first time they request content in a specific locale:
 
@@ -173,7 +173,7 @@ To accomplish this, browsers should introduce new `Client Hint` header fields as
 
 The `Sec-` prefix used on these headers prevents scripts and other application content from setting them in user agents, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. See [HTTP Client Hints Section 4.2, Deployment and Security Risks](https://datatracker.ietf.org/doc/html/rfc8942#section-4.2) for more information.
 
-Designing the `Client Hints` header fields requires a tradeoff between fingerprinting mitigation and using a parsimonious set of headers. The approach that best prevents fingerprinting is to give each separate tag its own `Client Hint` header. Since servers must advertise their use of each header, fully separating the tags makes fingerprinting attempts more obvious &mdash;  a server that requests a large number of `Client Hints` without need is broadcasting its potential intent to use the information gathered from the client for the purpose of fingerprinting. However, if header bloat becomes a primary concern, some of these headers can be grouped. For example, `hc`, `fw` and `ca` could be grouped together as preferences related to date and time, or `fw`, `hc`, and `mu` could be grouped due not to conceptual similarity but instead to how they are strongly correlated with each other, since users following United States regional standards are likely to want `-u-fw-sun-hc-h12-mu-fahrenhe`, while users in much of the rest of the world are likely to want `-u-fw-mon-hc-h23-mu-celsius`. 
+Designing the `Client Hints` header fields requires a tradeoff between fingerprinting mitigation and using a parsimonious set of headers. The approach that best prevents fingerprinting is to give each separate tag its own `Client Hint` header. Since servers must advertise their use of each header, fully separating the tags makes fingerprinting attempts more obvious &mdash;  a server that requests a large number of `Client Hints` without need is broadcasting its potential intent to use the extra information gathered from the client for fingerprinting. However, if header bloat becomes a primary concern, some of these headers can be grouped. For example, `hc`, `fw` and `ca` could be grouped together as preferences related to date and time, or `fw`, `hc`, and `mu` could be grouped due not to conceptual similarity but instead to how they are strongly correlated with each other, since users following United States regional standards are likely to want `-u-fw-sun-hc-h12-mu-fahrenhe`, while users in much of the rest of the world are likely to want '-u-fw-mon-hc-h23-mu-celsius'. 
 
 Should the ability to customize settings beyond those expressible through BCP 47 tags become incorporated into this proposal, grouping will necessarily become a more pressing concern. For example, should additional preferences related to number formatting become part of the proposal, these could be grouped together with `nu`. 
 
@@ -245,7 +245,7 @@ A user viewing content in 'en-US' or 'zh-CN' is, all else being equal, going to 
 
 ### Criteria for selecting available locale extension strings? 
 
-Determining the specific locale extension strings set for each region will require user research. It is possible that in many regions the only strings available will be some subset of `-u-fw-monday-hc-h23-mu-celsius` or `-u-fw-sunday-hc-h12-mu-fahrenhe`.
+Determining the specific locale extension strings set for each region will require user research. It is possible that in many regions the only strings available will be some subset of '-u-fw-monday-hc-h23-mu-celsius' or '-u-fw-sunday-hc-h12-mu-fahrenhe'.
 
 ### Options that aren't captured by Unicode Extensions for BCP 47
 
@@ -255,10 +255,8 @@ There exist other localization-related customizations that would be useful for s
 
 A conservative approach should be taken in adding and especially in removing available locale extension strings. This is in order to avoid situations wherein (for example) users are unsure what scale a given temperature is in, or situations where a user who had previously been allowed to use their preferred numbering system no longer have access to it.
 
-### Will users be more likely to express their preferences when accessing content in commonly used locales than they are in less commonly used ones?
-
-Yes. More people from more regions are likely to have their preferences honored when visiting sites with content in 'en-US' and other very widely used locales than they are when accessing content in uncommon locales. 
-
 ### How many possible locale extension strings will be supported in each locale?
 
-Answering this question responsibly will require user research. It is possible that many varied sets of preferences are safely expressible in many locales, and it is also possible that most locales might only support '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-12-mu-fahrenhe', plus whatever values for the `nu` key are common in that locale. Note, though, that even the minimal case would result in substantial improvement to the experience of the web. 
+Answering this question responsibly will require user research. It is possible that many varied sets of preferences are safely expressible in many locales, and it is also possible that most locales might only support '-u-fw-mon-hc-h23-mu-celsius' or '-u-fw-sun-hc-12-mu-fahrenhe', plus whatever values for the `nu` key are common in that locale. 
+
+Note, though, that even if only the minimal case could be supported, this would nevertheless substantially improve the experience of the Web for many users.
