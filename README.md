@@ -111,7 +111,6 @@ Browsers carry out the following steps the first time they request content in a 
 3. Scripts can then request the retained settings, but only one-by-one. 
 
 Discarded preferences are set to `undefined`, as are preferences that match the defaults for the locale. For example, if a user has set 'ca-buddhist', but that preference cannot be safely expressed in the content's locale, then `calendar`'s value would be `undefined`. If a user's OS preferences are the defaults for 'en-US' and they are accessing content in 'en-US', all potential preference settings would be left `undefined`.
->>>>>>> af76693 (several clarifying sentences/paragraphs introduced)
 
 ### IDL
 
