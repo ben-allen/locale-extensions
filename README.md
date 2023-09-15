@@ -4,6 +4,8 @@ A TC39 proposal to explore allowing Web platform engines to use a small subset o
 
 Note: Current proposed solution strategy for the proposal does not involve extending `Intl`, however, this may become necessary as solution is designed/developed. 
 
+*Stage*: 0
+
 ## Table of Contents
 
 - [Explainer:  Locale Extensions](#explainer-locale-extensions)
