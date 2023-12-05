@@ -17,7 +17,7 @@
     - [Preferred Numbering System](#preferred-numbering-system)
     - [Preferred Calendar](#preferred-calendar)
   - [Avoiding Prioritization of Larger Linguistic Communities](#avoiding-prioritization-of-larger-linguistic-communities)
-    - [Considering Content Locale](#considering-content-locale)s
+    - [Considering Content Locales](#considering-content-locale)
     - [Options Reduction](#options-reduction)
   - [Mechanisms](#mechanisms)
     - [Agent-Driven Negotiation: JavaScript API](#agent-driven-negotiation-javascript-api)
