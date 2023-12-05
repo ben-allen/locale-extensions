@@ -104,7 +104,7 @@ Fingerprinting servers necessarily know other pieces of locale-related informati
 
 The student in the example above's browser locale will almost certainly reflect either where they're from (in this case, 'nl') or where they're visiting (in this case, 'en-US'). 
 
-1. If the student's browser locale is 'nl', the server can already determine that they most likely prefer `-u-fw-mon-hc-h23-mu-celsius` by inspecting the `Accept-Language` header. Although the guidelines in _Mitigating Browser Fingerprinting_ reject the claim that fingerprinting mitigation is unnecessary in situations where the revealed data is already revealed elsewhere, in this case we are reasonably safe to expose this information: it is not plausible that the Web platform will ever remove the ability for users to indicate their most preferred language.
+1. If the student's browser locale is 'nl', the server can already determine that they most likely prefer `-u-fw-mon-hc-h23-mu-celsius` by inspecting the `Accept-Language` header. Although the guidelines in _Mitigating Browser Fingerprinting_ are clear that fingerprinting mitigation is still necessary in situations where the revealed data is already revealed elsewhere, in this case we are reasonably safe to expose this information: it is not plausible that the Web platform will ever remove the ability for users to indicate their most preferred language.
 
 2. If the student's browser locale is 'en-US', revealing this preference string will likewise leave them with a relatively large anonymity set &mdash; most people from the regions that use those preferences by default will have left their defaults unchanged, and it is to be expected that there will be a large number of people in the same situation as our student: requesting 'en-US' with OS settings matching the defaults for the hundreds of locales that default to `-u-fw-mon-hc-h23-mu-celsius`.
 
@@ -112,9 +112,9 @@ In this scenario, wherein the user requests a combination of settings that diffe
 
 ### Example: People with preferences that differ from *all* commonly used locale defaults
 
-Every commonly used combination of `fw` and `hc` can be used in combination with the value `celsius` for `mu`. However, since the only sizable locale that defaults to `fahrenhe` is 'en-US' combinations of preferences involving `fahrenhe` that otherwise differ from the 'en-US' defaults are not guaranteed to be commonly used. However, there are a number of people likely to use a browser locale of 'en-US' with preferences that differ from the United States defaults:
+Every commonly used combination of `fw` and `hc` can be used in combination with the value `celsius` for `mu`. However, since the only sizable locale that defaults to `fahrenhe` is 'en-US' combinations of preferences involving `fahrenhe` that otherwise differ from the 'en-US' defaults are not guaranteed to be commonly used. Nevertheless, there are a number of people likely to use a browser locale of 'en-US' with preferences that differ from the United States defaults:
 
-* People working with organizations (healthcare providers, military agencies, non-U.S. governmental organizations, international NGOs and businesses) that use a 24 hour clock.
+* People working with organizations that use a 24 hour clock.
 * People with social, familial, and cultural ties to regions that use Saturday as the first day of the workweek.
 * People who for reasons of simple personal preference like their calendar to have the first day of the workweek at the left-hand side of their calendars.
 * People not from or in the United States who are nevertheless using 'en-US' as their browser locale.
@@ -151,24 +151,28 @@ See the section _Avoiding Prioritizing Larger Linguistic Communities_ for strate
 
 Nearly all regions use the Gregorian calendar, which is expressed as a locale extension tag as `ca-gregory`. It is likely safe in all regions to explicitly request `ca-gregory`, since texts from regions that use non-Gregorian calendars typically present dates from the Gregorian calendar alongside dates in their local calendar. 
 
-It is likewise safe for users to send requests for non-Gregorian calendars when the specific calendar requested is either the default for the user's locale or a commonly used alternate in that locale. However, outside of these cases requesting a non-Gregorian calendar would likely serve to immediately individuate the user. 
+It is safe for users to send requests for non-Gregorian calendars when the specific calendar requested is either the default for the user's locale or a commonly used alternate in that locale. However, outside of these cases requesting a non-Gregorian calendar would likely serve to immediately individuate the user. 
 
 User research will be required to determine which alternate calendar preferences are safe to express in each locale. 
 
-## Avoiding prioritizing larger linguistic communities.
+## Avoiding prioritization of larger linguistic communities.
 
 Preserving the size of the user's anonymity set necessarily requires ensuring that they can't send rarely used combinations of preferences. However, internationalization requires respecting the needs of users even (or especially) when they're from a relatively small cultural or linguistic community. An approach that treats the combination of the user's browser localization and user preferences as the factors determining which preferences are safe to send necessarily gives more options to people from very large linguistic and cultural communities. This runs directly against the spirit of internationalization. 
 
-If the only sources of entropy we consider are the browser locale and the set of preferences sent, then we are forced to either offer very few options to all users, or else offer more options to users using the most commonly used locales. Given the choice between these two options, the first is preferable. There may, however, be strategies that allow us to offer a robust range of preferences to all users, regardless of the size of their linguistic community. 
+If the only sources of entropy we consider are the browser locale and the set of preferences sent, then we are forced to either offer very few options to all users, or else offer fewer options to users requesting anything but the most commonly used locales. Given the choice between these two options, the first is preferable. There may, however, be strategies that allow us to offer a robust range of preferences to all users, regardless of the size of their linguistic community. 
 
 ### Considering content locale 
 
-One distinctive feature of locale-related user information is that most bits of this information are very strongly correlated. A user who prefers temperatures in Fahrenheit is very likely to prefer the other defaults for the `en-US` locale, a user with a browser locale in Europe is very likely to prefer Monday as the first day of the week, and so forth. 
+One distinctive feature of locale-related user information is that the individual pieces of information are often very strongly correlated. A user who prefers temperatures in Fahrenheit is very likely to prefer the other defaults for the `en-US` locale, a user with a browser locale in Europe is very likely to prefer Monday as the first day of the week, and so forth. 
 
 In addition to the information provided in the user's `Accept-Language` header, the server also necessarily knows one other piece of locale-related information: the locale of the content it is serving. This correlates strongly with the browser locale &mdash; if someone is receiving content in 'nl', it's very likely that their `Accept-Language` contains 'nl'. If a user's browser locale matches the content's locale, it may be reasonable to allow access to more preference options. 
 
-One potential site for further user research is determining what other combinations of browser locale and non-default userpreferences are common enough to allow when viewing specific content locales. This situation could arise when, for example, the region given in the browser locale has close cultural ties to the region in the content's locale, perhaps because of a shared language, because of economic ties, or because there exist diasporic communities from one of the regions in the other.
+One potential site for further user research is determining what other combinations of browser locale and non-default user preferences are common enough to allow when viewing specific content locales. This situation could arise when, for example, the region given in the browser locale has close cultural ties to the region in the content's locale, perhaps because of a shared language, because of economic ties, or because there exist diasporic communities from one of the regions in the other.
 
-It may also be the case that widely used locales ('en-US' being the clearest example) may sh
+One site for user research is determining whether significant numbers of people from other locales ultimately receive content from one of a handful of very commonly used locales. If so, users from those locales may safely transmit user preferences information while viewing content in those commonly used locales. 
 
-### 
+There are a number of difficulties involved in taking content locale into consideration. When using the `Client Hints` architecture, steps would have to be taken to ensure that the content's locale is known to the browser before the browser can safely reveal preference information. It may be easier to find and use a rough proxy for content locale &mdash; for example, the TLD of the server.
+
+### Options reduction
+
+Reducing the number of options available across locales is a possible way to ensure that users of minority languages can express some preferences without necessarily exposing themselves to additional privacy loss. The removal of `fw` from the proposal, as previously mentioned, is one possibility. An additional possibility is limiting use of the `mu` tag &mdash; for example, allowing users to request the common `mu-celsius` setting, but not the rare `mu-fahrenhe` one. This would reduce the total entropy exposed, while still honoring the preferences of a wide range of users.
