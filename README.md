@@ -13,7 +13,7 @@
     - [Example: People who have traveled from one region to another](#example-people-who-have-traveled-from-one-region-to-another)
       - [Preferences in Combination with Browser Localization](#preferences-in-combination-with-browser-localization)
     - [Example: People with preferences that differ from all commonly used locale defaults](#example-people-with-preferences-that-differ-from-all-commonly-used-locale-defaults)
-  - [Supported Tags Group #2: Numbering system and calendar](#supported-tags-group-2-numbering-system-and-calendar)]
+  - [Supported Tags Group #2: Numbering system and calendar](#supported-tags-group-2-numbering-system-and-calendar)
     - [Preferred Numbering System](#preferred-numbering-system)
     - [Preferred Calendar](#preferred-calendar)
   - [Avoiding Prioritization of Larger Linguistic Communities](#avoiding-prioritization-of-larger-linguistic-communities)
