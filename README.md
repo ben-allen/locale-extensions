@@ -8,10 +8,12 @@
   - [Overview](#overview)
   - [Summary of Proposed Supported Locale Extension Combinations](#summary-of-proposed-supported-locale-extension-combinations)
   - [Fingerprinting and Internationalization](#fingerprinting-and-internationalization)
+    - [Fingerprinting Mitigation](#fingerprinting-mitigation)
+    - [Overview of Mitigation Strategies](#overview-of-mitigation-strategies)
   - [Supported Tags Group #1:  Preferred first day of week, preferred clock, preferred temperature measurement unit](#supported-tags-group-1-preferred-first-day-of-week-preferred-clock-preferred-temperature-measurement-unit)
     - [Commonly Used Locale Defaults](#commonly-used-locale-defaults)
     - [Example: People who have traveled from one region to another](#example-people-who-have-traveled-from-one-region-to-another)
-      - [Preferences in Combination with Browser Localization](#preferences-in-combination-with-browser-localization)
+      - [Revealed Information as Conditioned on Browser Localization](#revealed-information-as-conditioned-on-browser-localization)
     - [Example: People with preferences that differ from all commonly used locale defaults](#example-people-with-preferences-that-differ-from-all-commonly-used-locale-defaults)
   - [Supported Tags Group #2: Numbering system and calendar](#supported-tags-group-2-numbering-system-and-calendar)]
     - [Preferred Numbering System](#preferred-numbering-system)
@@ -48,11 +50,11 @@ On the Web platform, content localization is dependent only upon a user's langua
 2. In some locales multiple numbering systems are in common use. Users seeking content in these locales may find one or the other of these numbering systems not immediately intelligible, and therefore need a way to request content they can read.
 3. An English-speaking user from Japan receives non-localized content in 'en-US'. They can read English, but nevertheless prefer seeing a 24-hour clock and calendars that have Monday, rather than Sunday, as the first day of the week.
 4. More generally: 'en-US' is currently the typical untranslated language for software, even though 'en-US' has region-specific formatting patterns that differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures and times represented in globally uncommon scales.
-5. Users who has emigrated from one country to another may want to set their language dialect to one they can understand, but prefer that dates, times, and numbers be rendered according to local standards.
+5. Users who have emigrated from one country to another may want to set their language dialect to one they can understand, but prefer that dates, times, and numbers be rendered according to local standards.
 
 In the native environment these problems are easily solved, since users can specify their preferences in their system settings. However, offering the full amount of flexibility that the native environment allows is not possible in the often hostile Web environment. This is because when a user's preferences as specified in their OS settings are uncommon, or even just very detailed, revealing them can result in privacy loss. 
 
-This proposal defines a mechanism for web clients to read user preferences from their operating system and then relay a safe subset of those preferences to servers, while refraining from sending combinations of preferences that are likely to individuate those users. This allows for significantly more complete &mdash; but not necessarily perfect &mdash; localization while only exposing relatively coarse-grained data about users. 
+This proposal defines a mechanism for web clients to read user preferences from their operating system and then relay a safe subset of those preferences to servers, while refraining from sending combinations of preferences that are likely to substantially individuate the user. We aim to allow for significantly more complete &mdash; but not necessarily perfect &mdash; localization that respects user preferences insofar as possible while only exposing relatively low-surprisal information about users.
 
 ## Overview 
 
@@ -64,7 +66,7 @@ For **client-side applications**, [a browser API](#agent-driven-negotiation-java
 
 For **server-side applications**, [a set of `Client Hints` request header fields](#proactive-content-negotiation-with-client-hints). Servers indicate the specific proactive content negotiation headers they accept in the `Accept-CH` response header.
 
-The proposed API and `Client Hints` infrastructure are straightforward: the API provides methods for accessing each individual preference separately, and the `Client Hints` headers also provide a means to request each individual preference separately. There is no provided way in either mechanism to request all preferences at once -- each preference must be explicitly requested. Although this proposal discusses prefered localization tailorings in terms of Unicode Extensions for BCP 47, there is no way for servers to request the entire extension string at once.
+The proposed API and `Client Hints` infrastructure are straightforward: the API provides methods for accessing each individual preference separately, and the `Client Hints` headers also provide a means to request each individual preference separately. There is no provided way in either mechanism to request all preferences at once &mdash; each preference must be explicitly requested. Although this proposal discusses prefered localization tailorings in terms of Unicode Extensions for BCP 47, there is no way for servers to request the entire extension string at once.
 
 We propose supporting commonly used combinations of the following customization options. The list is given in rough order of priority, with numbering system being the highest priority customization and preferred first day of week the lowest.
 
@@ -83,38 +85,51 @@ User research data will also be necessary to determine whether all five of these
 This proposal discusses the five tags above in two groups:
 
 * `fw`, `hc`, and `mu` (first day of week, clock, temperature measurement unit). These tags makes sense to discuss in one group because the number of valid settings for each of them is naturally limited.
-* `ca` and `nu` (calendar, numbering system). A large number of options are available for these tags, but in most locales settings other than the default is dangerous. The `nu` option in particular presents a delicate problem: in many contexts, using it at all would result in the user becoming immediately distinguishable from all other users, but in some contexts failing to provide it results in a number of users receiving unintelligible content.
+* `ca` and `nu` (calendar, numbering system). A large number of options are available for these tags, but in most locales settings other than the default is dangerous. The `nu` option is particularly important, but also presents a delicate problem: in many contexts, using it at all would result in the user becoming immediately distinguishable from all other users, but in some contexts failing to provide it potentially results in a large number of users receiving unintelligible content.
 
-## Summary of Proposed Supported Locale Extension Combinations
+## Summary of proposed supported locale extension combinations
 
-Calculating the bits of entropy exposed through exposing content tailoring preferences is not straightforward, as the user's preferred locale and the sets of preferences exposed are in no way statistically independent. As such, determining the specific combinations of options for each locale will require user research data. 
 
-Our goal is to whenever possible offer users to request content tailored according to:
+Our goal is to whenever possible offer users to request the following types of content tailorings:
 
 * Any combination of values for the five locale extension tags listed above that matches the default settings in the locale (or locales) sent in the client's `Accept-Language` header.
-* Any other combination of values for the five locale extension tags that is otherwise commonly used in the locale (or locales) sent in the client's `Accept-Language` header.
-
-It may also be possible to offer different combinations of preferences for different *content* locales, due to the statistical dependencies between the user's preferred locale, the locale of the content they ultimately receive, and the set of content tailoring preferences they may want to transmit. Determining the feasability of this strategy will likewise require user research data.
+* Any combination of values for the five locale extension tags that is otherwise commonly used in the locale (or locales) sent in the client's `Accept-Language` header.
+* Any combination of values which bears little surprisal when considered in combination with other locale-related information about the user that the server already knows.
+* Values for the `nu` tag that, if not honored, would result in users receiving unintelligible content.
 
 A top priority is allowing users to specify alternate numbering systems in languages where multiple commonly used numbering systems exist. Another key priority is ensuring that whatever level of flexibility is extended to users of commonly spoken languages is also extended to users from smaller cultural/linguistic communities. 
 
-## Fingerprinting and Internationalization
+## Fingerprinting and internationalization 
 
-The standard practice in explainers is to put a section on security and privacy toward the end. In this explainer we have moved it up to nearly the start. This is because the benefits of allowing users to receive content tailored to their actual preferences are self-apparent, particularly in contexts where failing to honor those preferences could result in users receiving content that is confusing or unintelligible to them.  What makes this proposal difficult is the threat of fingerprinting.  This is the practice of uniquely identifying users by gathering together information about the user that, when taken as a totality, can be used to distinguish that user from all others, even when none of the individual pieces of information could in isolation be used to de-anonymize the user. Fingerprinting allows sites to track users without their knowledge or consent, thereby meaningfully violating user privacy.
+The standard practice in explainers is to put a section on security and privacy toward the end. In this explainer we have moved it up to nearly the start. This is because the benefits of allowing users to receive content tailored to their actual preferences are relatively self-apparent, particularly in contexts where failing to honor those preferences could result in users receiving content that is confusing or unintelligible to them.  What makes this proposal difficult is the threat of fingerprinting. A naïve approach to exposing user preference data can very easily result in a very large number of users unknowingly reducing the entropy of their identity to zero.
 
-Data gathered by the Electronic Frontier Foundation (EFF) for Peter Eckersley's 2010 paper [How Unique is your Browser?](https://coveryourtracks.eff.org/static/browser-uniqueness.pdf) estimated that 83.6% of browsers visiting the EFF's "Panopticlick" site bore a unique fingerprint. Some improvements have been made in the intervening years. Notably, the end of Adobe Flash and Java applets as Web technologies has foreclosed a number of potential fingerprinting attacks, and substantial measures have been taken to mitigate the risk of font-based fingerprinting.  Nevertheless, browsers today are nearly as fingerprintable as browsers in 2010 were. The process of reducing the potential for fingerprinting on the Web platform is necessarily a long and slow one  -- a process measured in decades rather than years -- involving the gradual replacement of technologies that expose more user information with technologies that expose less.
+Fingerprinting allows sites to track users without their knowledge or consent, thereby meaningfully violating user privacy, and mitigating fingerprinting risk is our top concern.  Data gathered by the Electronic Frontier Foundation (EFF) for Peter Eckersley's 2010 paper [How Unique is your Browser?](https://coveryourtracks.eff.org/static/browser-uniqueness.pdf) estimated that 83.6% of browsers visiting the EFF's "Panopticlick" site bore a unique fingerprint. Some improvements have been made in the intervening years. Notably, the end of Adobe Flash and Java applets as Web technologies has foreclosed a number of potential fingerprinting attacks, and substantial measures have been taken to mitigate the risk of font-based fingerprinting.  Nevertheless, browsers today are nearly as fingerprintable as browsers in 2010 were. The process of reducing the potential for fingerprinting on the Web platform is necessarily a long and slow one  &mdash; a process measured in decades rather than years &mdash; involving the gradual replacement of technologies that expose more user information with technologies that expose less.
 
-Fingerprinting is a particularly diabolical problem in the context of internationalization. The most straightforward way to prevent fingerprinting is to make it impossible to send rare combinations of settings. However, equitable internationalization requires providing access to content in less commonly used locales, with this content appropriately tailored for all communities of users regardless of the size of that community -- which is to say, it requires accommodating rare requests as well as common ones.  Moreover, requesting properly localized content necessarily requires exposing a significant amount of particularly sensitive information about the user, information that is not just useful for individuating the user but also can reveal details of the identity categories the user falls into.
+Fingerprinting is a particularly diabolical problem in the context of internationalization. The most straightforward way to prevent fingerprinting is to either send less information, or to make it impossible to send rare combinations of settings. However, equitable internationalization requires providing access to content in less commonly used locales, with this content appropriately tailored for all communities of users regardless of the size of that community -- which is to say, it requires accommodating many types of rare request.
 
-The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) WICG Interest Group Note, the best practices from which were used as a primary framework in the design of this proposal, observes that there exists no plausible way to eliminate fingerprinting. We can at most *mitigate* fingerprinting, either by reducing the available surface for fingerprinting by revealing less information, or by ensuring that whatever fingerprinting occurs is in some way observable ("active fingerprinting") instead of invisible to the user ("passive fingerprinting").  By ensuring that the only fingerprinting opportunities made available require action taken by the server, it becomes more possible to control fingerprinting through regulatory means. It is worth noting that use of browser fingerprints to track users without permission is [only questionably legal in the European Union](https://www.eff.org/deeplinks/2018/06/gdpr-and-browser-fingerprinting-how-it-changes-game-sneakiest-web-trackers).
+To further complicate the problem, there can be security implications even when the number of bits of information revealed through requesting properly localized content is relatively low. This is because the information we reveal could give strong indicators of the identity categories the user falls into, even when the overall entropy reduction is not sufficient for trackers to fully individuate the user, and because the information we reveal is specifically about the user rather than their device, and so can be used for cross-device tracking.
 
-This proposal involves exposing data about the OS settings of users, which necessarily exposes an attack surface for fingerprinting. However, we have made this surface as small as possible by limiting the number of individual preferences that can be revealed, by limiting the combinations that can be sent, and by ensuring that all attack surfaces made available as the result of this proposal are active fingerprinting surfaces.  
+### Fingerprinting mitigation
 
-_Mitigating Browser Fingerprinting_ makes clear that fingerprint mitigation requires minimizing the fingerprinting surface even when the information that could be gathered is already exposed by other parts of the Web platform. This is, among other reasons, because the Web platform is not static: if the same bits of entropy are exposed via two means, it becomes harder to remove the fingerprinting surface in the future, since it will require removing the attack surface from two different places at once. This spec aims to adhere to this guideline as closely as possible, with the goal of exposing significantly less information than one individual locale listed in the `Accept-Language` header's language list.
+The [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) WICG Interest Group Note, the best practices from which were used as a primary framework in the design of this proposal, observes that there exists no plausible way to eliminate fingerprinting. We can at most *mitigate* fingerprinting, either by reducing the available surface for fingerprinting by revealing less identifying information, or by ensuring that whatever fingerprinting occurs is in some way observable ("active fingerprinting") instead of invisible to the user ("passive fingerprinting").  By ensuring that the only fingerprinting opportunities made available require action taken by the server, it becomes more possible to control fingerprinting through regulatory means. It is worth noting that use of browser fingerprints to track users without permission is [only questionably legal in the European Union](https://www.eff.org/deeplinks/2018/06/gdpr-and-browser-fingerprinting-how-it-changes-game-sneakiest-web-trackers).
 
-This goal is somewhat arbitrary -- but not entirely arbitrary. Although the `Accept-Language` header provides the ability to request a preferred locale and several preferred fallback locales, it is generally known that users should never change the content of this header away from browser defaults. See, for example, [the MDN page on `Accept-Language`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language), which notes that "Users rarely change [this header] and such changes are not recommended because they may lead to fingerprinting." Google is currently trialling the reduction of the number of languages in `Accept-Language` to just one, due to the large attack surface exposed when multiple languages are listed. 
+_Mitigating Browser Fingerprinting_ makes clear that fingerprint mitigation requires minimizing the fingerprinting surface even when the information that could be gathered is already exposed by other parts of the Web platform. This is, among other reasons, because the Web platform is not static: if the same pieces of identity-related information are exposed via two means, it becomes harder to remove the fingerprinting surface in the future, since it will require removing the attack surface from two different places at once. This spec aims to adhere to this guideline as closely as possible.
 
-A user who will accept content tailored to either of two or more different locales &mdash; say they want 'fr-FR' but accept 'fr-CA' as a fallback  &mdash; might be tempted to list both of these in `Accept-Language`. Even though this combination of preferences may be somewhat common, the amount of information revealed through explicitly requesting it could easily make the user immediately identifiable. This proposal provides a mechanism that provides very coarse-grained data about the user, and is in all cases exposes significantly fewer bits of entropy than are exposed by each entry in `Accept-Language`. 
+### Overview of mitigation strategies
+
+Our strategies for mitigating fingerprinting risk are as follows:
+
+* Ensuring that the only fingerprinting surfaces we reveal are active fingerprinting surfaces
+* Only revealing settings when the surprisal of that information is relatively low when conditioned on already-revealed locale-related information.
+
+In the current version of this proposal the pieces of already-revealed locale related information we consider are:
+
+* The locale or locales revealed through the `Accept-Language` header and through `navigator.languages`
+* The locale of the retrieved content itself.
+
+The specific pieces of conditioning information used in this proposal are not to be understood as a definitive list of factors to consider when determining the safety of revealing user preferences, but are to be taken as an illustrative example. Should a version of this proposal be adopted, the already-revealed information ultimately used to determine whether a given setting is safe to transmit must take into account the extant realities of content localization on the Web rather than simply treating `Accept-Language` and `navigator.languages` in isolation.
+
+Calculating the entropy lost through exposing content tailoring preferences is not straightforward, as the distribution of preferences is highly unequal, and is statistically dependent on other locale-related information about the user. As such, determining the specific combinations of valid options will require extensive user research data, as will determining which pieces of already-known information are most salient for determining conditional entropy. 
 
 ## Supported tags group 1: Preferred first day of week, preferred clock, preferred temperature measurement unit.
 
@@ -129,7 +144,7 @@ As such, for most users their combination of preferred settings for these three 
 
 ### Commonly used locale defaults
 
-CLDR's supplemental data provides information on the default settings for these options for each region, alongside information on the population of the region, the languages spoken in the region, and the literary rate of the region. To get a *very* rough estimate &mdash; any real estimate would require user research &mdash; of the number of people in the world who would have the same settings for 'fw`, `hc`, and `mu`, we've multiplied the population of each region by the literacy rate of that region, and summed the literate populations of the regions which by default use those settings.  
+CLDR's supplemental data provides information on the default settings for these options for each region, alongside information on the population of the region, the languages spoken in the region, and the literary rate of the region. To get a *very* rough estimate &mdash; any real estimate would require user research &mdash; of the number of people in the world who would have the same settings for `fw`, `hc`, and `mu`, we've multiplied the population of each region by the literacy rate of that region, and summed the literate populations of the regions which by default use those settings.  
 
 | extension string             | population | # locales using |
 |------------------------------|------------|-----------------|
@@ -146,25 +161,30 @@ CLDR's supplemental data provides information on the default settings for these 
 
 The three strings that rarely appear in region defaults reflect, in order, the default preferences in the Maldives, the default preferences in Belize, and the default preferences in both the Cayman Islands and Palau. All of the regions other than the United States that are listed as using a string indicating a preference for the Fahrenheit scale only use Fahrenheit for referring to weather.
 
+Although the likelihood of a user's browser locale defaults matching one or another of the particular strings is not equal, the total entropy lost through revealing one of these strings is relatively low. Provided we disallow use of the three rare strings at the bottom of the table, we find that this distribution has 2.18 bits of entropy, only a little bit below the 2.58 bits of entropy obtained through rolling a balanced six-sided die. Exposing the preference string you've selected appears relatively safe &mdash; but only when taken in isolation, since the likelihood of selecting a particular preference string is statistically dependent upon other pieces of already-known locale-related information.
+
 ### Example: People who have traveled from one region to another
 
 Consider the case of a student from the Netherlands who is spending a year at a university in Chicago. This student could avoid annoyance (and possibly error) if the university's course catalog displayed times on a 24 hour cycle instead of using the 12 hour clock common in the United States, and for the same reason would likewise prefer if calendars were displayed with Monday, rather than Sunday, as the first day of the week. Additionally, they are not acclimated to the region's extreme winters, and sometimes use the weather display on a local news site to help determine how many layers of clothes to wear. They would very much like to avoid the frustration and potential for mishap involved in converting temperatures from the unfamiliar Fahrenheit scale to the immediately comprehensible Celsius scale. 
 
 Native applications can directly read the OS settings for preferred clock, first day of week, and temperature measurement system. However, it is not safe to directly expose this information to potentially hostile Web servers, since if our user's settings were idiosyncratic those idiosyncratic settings could easily be used to track them. It's safe to set your OS to display temperatures in Kelvin, but dangerous to tell arbitrary Web servers about it. 
 
-The student's preferences can be expressed by the locale extension string `-u-fw-mon-hc-h23-mu-celsius`. Consulting the table above, we see that the preferences of our hypothetical student are shared with billions of other people. Revealing this low-suprisal set of preferences would not by itself dramatically reduce the size of the student's anonymity set.
+The student's preferences can be expressed by the locale extension string `-u-fw-mon-hc-h23-mu-celsius`. Revealing this low-suprisal set of preferences would not by itself dramatically reduce the size of the student's anonymity set. However, we cannot consider the raw number of people expected to have this set of preferences in isolation, because the surprisal of a particular setting conditioned on other known pieces of information about the user can be quite high.
 
-#### Preferences in Combination with Browser Localization
+#### Revealed information as conditioned on browser localization
 
-Fingerprinting servers necessarily know other pieces of locale-related information that they can use in combination with the preferences string to further reduce the size of a user's anonymity set. Most obviously, servers know the contents of the `Accept-Language` header, and can also get equivalent information by consulting `navigator.languages`. For the sake of simplicity, we will refer to the requested locale or locales made available via these two routes as the "browser locale."
+Fingerprinting servers necessarily know other pieces of locale-related information. Most obviously, servers know the contents of the `Accept-Language` header, and can also get equivalent information by consulting `navigator.languages`. For the sake of simplicity, we will refer to the requested locale or locales made available via these two routes as the "browser locale." 
 
 The student in the example above's browser locale will almost certainly reflect either where they're from (in this case, 'nl') or where they're visiting (in this case, 'en-US'). 
 
-1. If the student's browser locale is 'nl', the server can already determine that they most likely prefer `-u-fw-mon-hc-h23-mu-celsius` by inspecting the `Accept-Language` header. Because of the tight statistical dependency between a user's settings and the locale the browser sends, revealing this set of preferences gives up little additional surprisal. Although the guidelines in _Mitigating Browser Fingerprinting_ are clear that fingerprinting mitigation is still necessary in situations where the revealed data is already revealed elsewhere, in this case we are reasonably safe to expose this information: it is not plausible that the ability for users to indicate their most preferred language will ever be removed from the Web platform.
+1. If the student's browser locale is 'nl', the server can already determine that they most likely prefer `-u-fw-mon-hc-h23-mu-celsius` by inspecting the `Accept-Language` header. Because of the strong correlation between a user's settings and the locale the browser sends, the surprisal of this set of preferences is low. 
 
-2. If the student's browser locale is 'en-US', revealing this preference string will likewise leave them with a relatively large anonymity set &mdash; most people from the regions that use those preferences by default will have left their defaults unchanged, and it is to be expected that there will be a large number of people in the same situation as our student: requesting 'en-US' with OS settings matching the defaults for the hundreds of locales that default to `-u-fw-mon-hc-h23-mu-celsius`.
+2. If the student's browser locale is 'en-US', revealing this preference string will likewise leave them with a relatively large anonymity set &mdash; most people from the regions that use those preferences by default will have left their defaults unchanged, and it is to be expected that there will be other people in the same situation as our student: requesting 'en-US' with OS settings matching the defaults for the hundreds of locales that default to `-u-fw-mon-hc-h23-mu-celsius`.
 
-In this scenario, wherein the user requests a combination of settings that differ from the defaults in the current locale but are the same as the defaults in other locales, revealing the user's settings does not dramatically reduce the size of their anonymity set. 
+Determining the number of bits of information revealed in the second of the above scenarios will require user research. If about 5% of users of browsers localized to 'en-US' prefer `-u-fw-mon-hc-h23-mu-celsius`, either because they are, like our student, visiting the United States, or because for whatever reason they simply decided to download a browser version localized to 'en-US', our student has lost around 4.32 bits of entropy by revealing that preference. This is a significant amount of lost entropy.
+
+Note, though, that we have reason to feel somewhat optimistic about *the specific case* of 'en-US', since a large number of people not from the U.S. use browsers localized to 'en-US'. It is possible that sufficient users worldwide fall into this category that it is safe for browsers localized to 'en-US' to reveal relatively more information than other browsers.
+
 
 ### Example: People with preferences that differ from *all* commonly used locale defaults
 
@@ -175,15 +195,7 @@ Every commonly used combination of `fw` and `hc` can be used in combination with
 * People who for reasons of simple personal preference like their calendar to have the first day of the workweek at the left-hand side of their calendars.
 * People not from or in the United States who are nevertheless using 'en-US' as their browser locale.
 
-Because of the large number of people using 'en-US', it will likely be safe to offer most of these combinations of preferences despite them not being commonly used locale defaults. User research will be required. If allowing all of these settings is not possible without making users of those settings easily individuatable, it may be possible to respect most preferences of most users while retaining larger anonymity sets by dropping support for the `fw` tag. See the table below for the number of people in locales that default to each of the possible strings with `fw` removed:
-
-| extension string      | population | # locales using |
-|-----------------------|------------|-----------------|
-| -u-hc-h23-mu-celsius  | 3,715,114,985 | 905             |
-| -u-hc-h12-mu-celsius  | 2,205,286,859 | 503             |
-| -u-hc-h12-mu-fahrenhe | 332,596,413  | 29              |
-| -u-hc-h23-mu-fahrenhe | 307,290     | 2               |
-
+Because of the large number and wide range of people using 'en-US' as their browser locale, it may be safe to offer most of these combinations of preferences despite them not being commonly used locale defaults. User research will be required. 
 
 ## Supported tags group #2: Numbering system and calendar 
 
@@ -207,25 +219,25 @@ See the section _Avoiding Prioritizing Larger Linguistic Communities_ for strate
 
 Nearly all regions use the Gregorian calendar, which is expressed as a locale extension tag as `ca-gregory`. It is likely safe in all regions to explicitly request `ca-gregory`, since the Gregorian calendar is in common use even in regions with other official civic calendars.
 
-It is safe for users to send requests for non-Gregorian calendars when the specific calendar requested is either the default for the user's locale or a commonly used alternate in that locale. However, requesting a non-Gregorian calendar outside of those cases would likely serve to immediately individuate the user. Generally speaking we should aim to send user preferences for the subset of the calendars in each region that are actually in relatively common use in that region, and no others.
+It is safe for users to send requests for non-Gregorian calendars when the specific calendar requested is either the default for the user's locale or a commonly used alternate in that locale, since the surprisal of that information is relatively low.  However, requesting a non-Gregorian calendar outside of those cases would likely serve to immediately reduce the entropy of the user's identity to 0. 
 
 Once again, user research will be required to determine which alternate calendar preferences are safe to express in each locale. 
 
-## Avoiding Prioritization of Larger Linguistic Communities.
+## Avoiding prioritization of larger linguistic communities
 
-Preserving the size of the user's anonymity set necessarily requires ensuring that they can't send rarely used combinations of preferences. However, internationalization requires respecting the needs of users even (or especially) when they're from relatively small cultural or linguistic communities. An approach that treats the combination of the user's browser localization and user preferences as the only factors determining which preferences are safe to send necessarily gives more options to people from very large linguistic and cultural communities. This runs directly against the spirit of internationalization. 
+Preserving the size of the user's anonymity set necessarily requires ensuring that they can't send rarely used combinations of preferences. However, internationalization requires respecting the needs of users even (or especially) when they're from relatively small cultural or linguistic communities. An approach that treats the combination of the user's browser localization and user preferences as the only factors determining which preferences are safe to send necessarily gives more options to people from very large linguistic and cultural communities, since those users can lose relatively large amounts of entropy while still maintaining a viable anonymity set. 
 
-If the only sources of entropy we consider are the browser locale and the set of preferences sent, then we are forced to either offer very few options to all users, or else offer fewer options to users requesting anything but the most commonly used locales. Given the choice between these two options, the first is preferable. There may, however, be strategies that allow us to offer a robust range of preferences to all users, regardless of the size of their linguistic community. 
+As such, if the only revealed pieces of information we consider are the browser locale and the set of preferences sent, then we are forced to either offer very few options to all users, or else offer fewer options to users requesting content in anything but the most commonly used locales. Given the choice between those two options, we are obligated to choose the first, as prioritizing the needs of the largest communities over the needs of smaller communities runs directly against the spirit of internationalization.  
 
-### Considering Content Locale 
+There may, however, be strategies that allow us to offer a robust range of preferences to all users, regardless of the size of their linguistic community, by looking for other pieces of locale-related information that share statistical dependencies with user preferences.
 
-One distinctive feature of locale-related user information is that the individual pieces of information are often very strongly correlated. A user who prefers temperatures in Fahrenheit is very likely to prefer the other defaults for the `en-US` locale, a user with a browser locale in Europe is very likely to prefer Monday as the first day of the week, and so forth. 
+Content locale, discussed below, is to be understood as a potential example of this type of already-known information &mdash; and maybe not a particularly good one. User preference settings are potentially statistically dependent on a swath of other pieces of locale-related information, and user research will be required to find the already-exposed information that's most fruitfully used as a condition for exposing user preference data.
 
-In addition to the information provided in the user's `Accept-Language` header, the server also necessarily knows one other piece of locale-related information: the locale of the content it is serving. This correlates strongly with the browser locale &mdash; if someone is receiving content in 'nl', it's very likely that their `Accept-Language` contains 'nl'. If a user's browser locale matches the content's locale, it may be reasonable to allow access to more preference options. 
+### Considering content locale 
+
+In addition to the information provided in the user's `Accept-Language` header, the server also necessarily knows additional pieces of locale-related information. For example, the server knows the locale of the content it is serving. This correlates strongly with the browser locale &mdash; if someone is receiving content in 'nl', it's very likely that their `Accept-Language` contains 'nl'. If a user's browser locale matches the content's locale, it may be possible for users to maintain a reasonably large anonymity set even if their settings are relatively uncommon, due to having an initially large anonymity set.
 
 One potential site for further user research is determining what other combinations of browser locale and non-default user preferences are common enough to allow when receiving specific content locales. This situation could arise when, for example, the region given in the browser locale has close cultural ties to the region in the content's locale, perhaps because of a shared language, because of economic ties, or because there exist diasporic communities from one of the regions in the other.
-
-One site for user research is determining whether significant numbers of people from other locales ultimately receive content from one of a handful of very commonly used locales. If so, users from those locales may safely transmit user preferences information while viewing content in those commonly used locales. 
 
 There are a number of difficulties involved in taking content locale into consideration. When using the `Client Hints` architecture, steps would have to be taken to ensure that the content's locale is known to the browser before the browser can safely reveal preference information.
 
@@ -233,11 +245,11 @@ There are a number of difficulties involved in taking content locale into consid
 
 Reducing the number of options available across locales is a possible way to ensure that users of minority languages can express some preferences without necessarily exposing themselves to additional privacy loss. The removal of `fw` from the proposal, as previously mentioned, is one possibility. An additional possibility is limiting use of the `mu` tag &mdash; for example, allowing users to request the common `mu-celsius` setting, but not the rare `mu-fahrenhe` one. This would reduce the total information exposed, while still honoring the preferences of a wide range of users.
 
-## Mechanisms for Expressing Locale Preferences
+## Mechanisms for expressing locale preferences
 
 The practicalities of implementation for this proposal are relatively straightforward, once the set of safe combinations of settings has been determined.
 
-### Agent-Driven Negotiation: JavaScript API 
+### Agent-driven negotiation: JavaScript API 
 
 We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property. Note that the API does not expose what locale extension string was selected, and requests for preferences must be made one-by-one. This constraint is in place as an additional fingerprinting mitigation measure &mdash; if scripts were allowed to fetch all preferences at once, it would be more difficult to detect active fingerprinting attempts. By requiring options be requested one-by-one, sites that (for example) ask for an alternate numbering system when delivering content in a locale for which there is no commonly used alternate numbering system would be immediately identifiable as bad actors.
 
@@ -315,6 +327,7 @@ Designing the `Client Hints` header fields requires a tradeoff between fingerpri
 
 Should the ability to customize settings beyond those expressible through BCP 47 tags become incorporated into this proposal, grouping will necessarily become a more pressing concern. For example, should additional preferences related to number formatting become part of the proposal, these could be grouped together with `nu`. 
 
+
 ### Usage Example
 
 <div class=example>
@@ -357,7 +370,7 @@ Note that servers **must** ignore hints that they do not support. Note also that
 3. Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones)
 4. Clearable local state
 
-The preservation of a relatively large anonymity set for all users is our central strategy for mitigating fingerprinting risk as much as possible while also ensuring a substantial improvement in the localization experience for a wide range of users. Rather than increasing the fingerprinting attack surface, this proposal could in fact help *reduce* the fingerprinting surface as a whole by providing a mechanism to get many of the benefits of adding additional entries to the 'Accept-Language' header, but without that header's passive fingerprinting surface.
+The preservation of a relatively large anonymity set for all users is our central strategy for mitigating fingerprinting risk as much as possible while also ensuring a substantial improvement in the localization experience for a wide range of users. 
 
 As noted in the [Security Considerations](https://datatracker.ietf.org/doc/html/rfc8942#section-4) section of the HTTP Client Hints RFC, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, because servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of [Mitigating Browser Fingerprinting in Web Specifications](https://www.w3.org/TR/fingerprinting-guidance/#detectability) describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice. In the absence of Client Hints, use of the JavaScript API can at least be detected by clients. In no case does this proposal allow for any new passive fingerprinting vectors. A site that attempts to (for example) request numbering system preferences while delivering content that supports no alternates is immediately visible as a bad actor: upon encountering this behavior from servers, browsers could issue warnings to users.
 
@@ -381,3 +394,8 @@ A conservative approach should be taken in adding and especially in removing ava
 
 Answering this question responsibly will require user research. A key consideration is ensuring that all browser locales receive at least as much ability to express alternate preferences as the most commonly used locales do.
 
+### Why is fingerprinting mitigation so important in this context?
+
+1. Fingerprinting mitigation is in general a best practice
+2. The specific data we reveal through this mechanism could be sensitive, since it may indicate that the user is a member of a marginalized or threatened identity category
+3. The specific data we reveal through this mechanism is specifically about the user, rather than their device, and so could be used for cross-device tracking
