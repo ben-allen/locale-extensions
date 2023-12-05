@@ -26,7 +26,7 @@
     - [Proactive Content Negotiation with Client Hints](#proactive-content-negotiation-with-client-hints) 
       - [`Client Hint` Header Fields](#client-hint-header-fields)
       - [Usage Example](#usage-example)
-  - [Final Notes on Security and Privacy(#final-notes-on-security-and-privacy)
+  - [Final Notes on Security and Privacy](#final-notes-on-security-and-privacy)
   - [FAQ](#faq)
 
 ## Authors:
