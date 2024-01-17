@@ -399,3 +399,4 @@ Answering this question responsibly will require user research. A key considerat
 1. Fingerprinting mitigation is in general a best practice
 2. The specific data we reveal through this mechanism could be sensitive, since it may indicate that the user is a member of a marginalized or threatened identity category
 3. The specific data we reveal through this mechanism is specifically about the user, rather than their device, and so could be used for cross-device tracking
+4. Because the data is read from OS settings, it is possible for users to not realize they're sending it
