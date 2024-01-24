@@ -44,6 +44,7 @@ Please post feedback on the issue tracker above or via email to Ben Allen or Sha
 
 
 
+
 ## Motivation
 
 On the Web platform, content localization is dependent only upon a user's language or region. This behavior can result in annoyance, frustration, offense, or even unintelligibility for some users. This proposal addresses common situations where users prefer locale-related tailorings that differ from the locale defaults. Consider the following issues:
@@ -67,6 +68,7 @@ The proposal includes two mechanisms for conveying OS settings to servers:
 For **client-side applications**, [a browser API](#agent-driven-negotiation-javascript-api) that fetches this information from the different platform-specific APIs. 
 
 For **server-side applications**, [a set of `Client Hints` request header fields](#proactive-content-negotiation-with-client-hints). Servers indicate the specific proactive content negotiation headers they accept in the `Accept-CH` response header.
+
 
 The proposed API and `Client Hints` infrastructure are straightforward: the API provides methods for accessing each individual preference separately, and the `Client Hints` headers also provide a means to request each individual preference separately. There is no provided way in either mechanism to request all preferences at once &mdash; each preference must be explicitly requested. Although this proposal discusses prefered localization tailorings in terms of Unicode Extensions for BCP 47, there is no way for servers to request the entire extension string at once.
 
@@ -207,6 +209,7 @@ The three tags discussed above naturally provide a limited number of options. Th
 
 CLDR supports nearly 100 different numbering systems. However, almost all of these options only make sense in a few locales. 
 
+
 We propose to restrict the number of available options for the `nu` tag to the following options:
 
 * The default for the browser locale
@@ -252,6 +255,7 @@ Reducing the number of options available across locales is a possible way to ens
 The practicalities of implementation for this proposal are relatively straightforward, once the set of safe combinations of settings has been determined.
 
 ### Agent-driven negotiation: JavaScript API 
+
 
 We expose the preferred options for these extensions in a JavaScript API via `navigator.locales` or by creating a new `navigator.localeExtensions` property. Note that the API does not expose what locale extension string was selected, and requests for preferences must be made one-by-one. This constraint is in place as an additional fingerprinting mitigation measure &mdash; if scripts were allowed to fetch all preferences at once, it would be more difficult to detect active fingerprinting attempts. By requiring options be requested one-by-one, sites that (for example) ask for an alternate numbering system when delivering content in a locale for which there is no commonly used alternate numbering system would be immediately identifiable as bad actors.
 
@@ -402,3 +406,4 @@ Answering this question responsibly will require user research. A key considerat
 2. The specific data we reveal through this mechanism could be sensitive, since it may indicate that the user is a member of a marginalized or threatened identity category
 3. The specific data we reveal through this mechanism is specifically about the user, rather than their device, and so could be used for cross-device tracking
 4. Because the data is read from OS settings, it is possible for users to not realize they're sending it
+
