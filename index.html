@@ -1,0 +1,1094 @@
+<!doctype html><html lang="en">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <title>Locale Extensions</title>
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
+  <meta content="Bikeshed version d6f2d6445, updated Tue Jan 17 11:25:25 2023 -0800" name="generator">
+  <link href="https://github.com/ben-allen/locale-extensions" rel="canonical">
+  <meta content="95045d5c0b6f5970f2be3454f3138dcee0971322" name="document-revision">
+<style>/* style-autolinks */
+
+.css.css, .property.property, .descriptor.descriptor {
+    color: var(--a-normal-text);
+    font-size: inherit;
+    font-family: inherit;
+}
+.css::before, .property::before, .descriptor::before {
+    content: "‘";
+}
+.css::after, .property::after, .descriptor::after {
+    content: "’";
+}
+.property, .descriptor {
+    /* Don't wrap property and descriptor names */
+    white-space: nowrap;
+}
+.type { /* CSS value <type> */
+    font-style: italic;
+}
+pre .property::before, pre .property::after {
+    content: "";
+}
+[data-link-type="property"]::before,
+[data-link-type="propdesc"]::before,
+[data-link-type="descriptor"]::before,
+[data-link-type="value"]::before,
+[data-link-type="function"]::before,
+[data-link-type="at-rule"]::before,
+[data-link-type="selector"]::before,
+[data-link-type="maybe"]::before {
+    content: "‘";
+}
+[data-link-type="property"]::after,
+[data-link-type="propdesc"]::after,
+[data-link-type="descriptor"]::after,
+[data-link-type="value"]::after,
+[data-link-type="function"]::after,
+[data-link-type="at-rule"]::after,
+[data-link-type="selector"]::after,
+[data-link-type="maybe"]::after {
+    content: "’";
+}
+
+[data-link-type].production::before,
+[data-link-type].production::after,
+.prod [data-link-type]::before,
+.prod [data-link-type]::after {
+    content: "";
+}
+
+[data-link-type=element],
+[data-link-type=element-attr] {
+    font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: .9em;
+}
+[data-link-type=element]::before { content: "<" }
+[data-link-type=element]::after  { content: ">" }
+
+[data-link-type=biblio] {
+    white-space: pre;
+}</style>
+<style>/* style-colors */
+
+/* Any --*-text not paired with a --*-bg is assumed to have a transparent bg */
+:root {
+    color-scheme: light dark;
+
+    --text: black;
+    --bg: white;
+
+    --unofficial-watermark: url(https://www.w3.org/StyleSheets/TR/2016/logos/UD-watermark);
+
+    --logo-bg: #1a5e9a;
+    --logo-active-bg: #c00;
+    --logo-text: white;
+
+    --tocnav-normal-text: #707070;
+    --tocnav-normal-bg: var(--bg);
+    --tocnav-hover-text: var(--tocnav-normal-text);
+    --tocnav-hover-bg: #f8f8f8;
+    --tocnav-active-text: #c00;
+    --tocnav-active-bg: var(--tocnav-normal-bg);
+
+    --tocsidebar-text: var(--text);
+    --tocsidebar-bg: #f7f8f9;
+    --tocsidebar-shadow: rgba(0,0,0,.1);
+    --tocsidebar-heading-text: hsla(203,20%,40%,.7);
+
+    --toclink-text: var(--text);
+    --toclink-underline: #3980b5;
+    --toclink-visited-text: var(--toclink-text);
+    --toclink-visited-underline: #054572;
+
+    --heading-text: #005a9c;
+
+    --hr-text: var(--text);
+
+    --algo-border: #def;
+
+    --del-text: red;
+    --del-bg: transparent;
+    --ins-text: #080;
+    --ins-bg: transparent;
+
+    --a-normal-text: #034575;
+    --a-normal-underline: #bbb;
+    --a-visited-text: var(--a-normal-text);
+    --a-visited-underline: #707070;
+    --a-hover-bg: rgba(75%, 75%, 75%, .25);
+    --a-active-text: #c00;
+    --a-active-underline: #c00;
+
+    --blockquote-border: silver;
+    --blockquote-bg: transparent;
+    --blockquote-text: currentcolor;
+
+    --issue-border: #e05252;
+    --issue-bg: #fbe9e9;
+    --issue-text: var(--text);
+    --issueheading-text: #831616;
+
+    --example-border: #e0cb52;
+    --example-bg: #fcfaee;
+    --example-text: var(--text);
+    --exampleheading-text: #574b0f;
+
+    --note-border: #52e052;
+    --note-bg: #e9fbe9;
+    --note-text: var(--text);
+    --noteheading-text: hsl(120, 70%, 30%);
+    --notesummary-underline: silver;
+
+    --assertion-border: #aaa;
+    --assertion-bg: #eee;
+    --assertion-text: black;
+
+    --advisement-border: orange;
+    --advisement-bg: #fec;
+    --advisement-text: var(--text);
+    --advisementheading-text: #b35f00;
+
+    --warning-border: red;
+    --warning-bg: hsla(40,100%,50%,0.95);
+    --warning-text: var(--text);
+
+    --amendment-border: #330099;
+    --amendment-bg: #F5F0FF;
+    --amendment-text: var(--text);
+    --amendmentheading-text: #220066;
+
+    --def-border: #8ccbf2;
+    --def-bg: #def;
+    --def-text: var(--text);
+    --defrow-border: #bbd7e9;
+
+    --datacell-border: silver;
+
+    --indexinfo-text: #707070;
+
+    --indextable-hover-text: black;
+    --indextable-hover-bg: #f7f8f9;
+
+    --outdatedspec-bg: rgba(0, 0, 0, .5);
+    --outdatedspec-text: black;
+    --outdated-bg: maroon;
+    --outdated-text: white;
+    --outdated-shadow: red;
+
+    --editedrec-bg: darkorange;
+}</style>
+<style>/* style-counters */
+
+body {
+    counter-reset: example figure issue;
+}
+.issue {
+    counter-increment: issue;
+}
+.issue:not(.no-marker)::before {
+    content: "Issue " counter(issue);
+}
+
+.example {
+    counter-increment: example;
+}
+.example:not(.no-marker)::before {
+    content: "Example " counter(example);
+}
+.invalid.example:not(.no-marker)::before,
+.illegal.example:not(.no-marker)::before {
+    content: "Invalid Example" counter(example);
+}
+
+figcaption {
+    counter-increment: figure;
+}
+figcaption:not(.no-marker)::before {
+    content: "Figure " counter(figure) " ";
+}</style>
+<style>/* style-dfn-panel */
+
+:root {
+    --dfnpanel-bg: #ddd;
+    --dfnpanel-text: var(--text);
+}
+.dfn-panel {
+    position: absolute;
+    z-index: 35;
+    height: auto;
+    width: -webkit-fit-content;
+    width: fit-content;
+    max-width: 300px;
+    max-height: 500px;
+    overflow: auto;
+    padding: 0.5em 0.75em;
+    font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+    background: var(--dfnpanel-bg);
+    color: var(--dfnpanel-text);
+    border: outset 0.2em;
+}
+.dfn-panel:not(.on) { display: none; }
+.dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
+.dfn-panel > b { display: block; }
+.dfn-panel a { color: var(--dfnpanel-text); }
+.dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
+.dfn-panel > b + b { margin-top: 0.25em; }
+.dfn-panel ul { padding: 0; }
+.dfn-panel li { list-style: inside; }
+.dfn-panel.activated {
+    display: inline-block;
+    position: fixed;
+    left: .5em;
+    bottom: 2em;
+    margin: 0 auto;
+    max-width: calc(100vw - 1.5em - .4em - .5em);
+    max-height: 30vh;
+}
+
+.dfn-paneled { cursor: pointer; }
+</style>
+<style>/* style-issues */
+
+a[href].issue-return {
+    float: right;
+    float: inline-end;
+    color: var(--issueheading-text);
+    font-weight: bold;
+    text-decoration: none;
+}
+</style>
+<style>/* style-md-lists */
+
+/* This is a weird hack for me not yet following the commonmark spec
+   regarding paragraph and lists. */
+[data-md] > :first-child {
+    margin-top: 0;
+}
+[data-md] > :last-child {
+    margin-bottom: 0;
+}</style>
+<style>/* style-selflinks */
+
+:root {
+    --selflink-text: white;
+    --selflink-bg: gray;
+    --selflink-hover-text: black;
+}
+.heading, .issue, .note, .example, li, dt {
+    position: relative;
+}
+a.self-link {
+    position: absolute;
+    top: 0;
+    left: calc(-1 * (3.5rem - 26px));
+    width: calc(3.5rem - 26px);
+    height: 2em;
+    text-align: center;
+    border: none;
+    transition: opacity .2s;
+    opacity: .5;
+}
+a.self-link:hover {
+    opacity: 1;
+}
+.heading > a.self-link {
+    font-size: 83%;
+}
+.example > a.self-link,
+.note > a.self-link,
+.issue > a.self-link {
+    /* These blocks are overflow:auto, so positioning outside
+       doesn't work. */
+    left: auto;
+    right: 0;
+}
+li > a.self-link {
+    left: calc(-1 * (3.5rem - 26px) - 2em);
+}
+dfn > a.self-link {
+    top: auto;
+    left: auto;
+    opacity: 0;
+    width: 1.5em;
+    height: 1.5em;
+    background: var(--selflink-bg);
+    color: var(--selflink-text);
+    font-style: normal;
+    transition: opacity .2s, background-color .2s, color .2s;
+}
+dfn:hover > a.self-link {
+    opacity: 1;
+}
+dfn > a.self-link:hover {
+    color: var(--selflink-hover-text);
+}
+
+a.self-link::before            { content: "¶"; }
+.heading > a.self-link::before { content: "§"; }
+dfn > a.self-link::before      { content: "#"; }
+</style>
+<style>/* style-syntax-highlighting */
+
+            pre.idl.highlight {
+                background: var(--borderedblock-bg, var(--def-bg));
+            }
+            
+code.highlight { padding: .1em; border-radius: .3em; }
+pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
+
+.highlight:not(.idl) { background: rgba(0, 0, 0, .03); }
+c-[a] { color: #990055 } /* Keyword.Declaration */
+c-[b] { color: #990055 } /* Keyword.Type */
+c-[c] { color: #708090 } /* Comment */
+c-[d] { color: #708090 } /* Comment.Multiline */
+c-[e] { color: #0077aa } /* Name.Attribute */
+c-[f] { color: #669900 } /* Name.Tag */
+c-[g] { color: #222222 } /* Name.Variable */
+c-[k] { color: #990055 } /* Keyword */
+c-[l] { color: #000000 } /* Literal */
+c-[m] { color: #000000 } /* Literal.Number */
+c-[n] { color: #0077aa } /* Name */
+c-[o] { color: #999999 } /* Operator */
+c-[p] { color: #999999 } /* Punctuation */
+c-[s] { color: #a67f59 } /* Literal.String */
+c-[t] { color: #a67f59 } /* Literal.String.Single */
+c-[u] { color: #a67f59 } /* Literal.String.Double */
+c-[cp] { color: #708090 } /* Comment.Preproc */
+c-[c1] { color: #708090 } /* Comment.Single */
+c-[cs] { color: #708090 } /* Comment.Special */
+c-[kc] { color: #990055 } /* Keyword.Constant */
+c-[kn] { color: #990055 } /* Keyword.Namespace */
+c-[kp] { color: #990055 } /* Keyword.Pseudo */
+c-[kr] { color: #990055 } /* Keyword.Reserved */
+c-[ld] { color: #000000 } /* Literal.Date */
+c-[nc] { color: #0077aa } /* Name.Class */
+c-[no] { color: #0077aa } /* Name.Constant */
+c-[nd] { color: #0077aa } /* Name.Decorator */
+c-[ni] { color: #0077aa } /* Name.Entity */
+c-[ne] { color: #0077aa } /* Name.Exception */
+c-[nf] { color: #0077aa } /* Name.Function */
+c-[nl] { color: #0077aa } /* Name.Label */
+c-[nn] { color: #0077aa } /* Name.Namespace */
+c-[py] { color: #0077aa } /* Name.Property */
+c-[ow] { color: #999999 } /* Operator.Word */
+c-[mb] { color: #000000 } /* Literal.Number.Bin */
+c-[mf] { color: #000000 } /* Literal.Number.Float */
+c-[mh] { color: #000000 } /* Literal.Number.Hex */
+c-[mi] { color: #000000 } /* Literal.Number.Integer */
+c-[mo] { color: #000000 } /* Literal.Number.Oct */
+c-[sb] { color: #a67f59 } /* Literal.String.Backtick */
+c-[sc] { color: #a67f59 } /* Literal.String.Char */
+c-[sd] { color: #a67f59 } /* Literal.String.Doc */
+c-[se] { color: #a67f59 } /* Literal.String.Escape */
+c-[sh] { color: #a67f59 } /* Literal.String.Heredoc */
+c-[si] { color: #a67f59 } /* Literal.String.Interpol */
+c-[sx] { color: #a67f59 } /* Literal.String.Other */
+c-[sr] { color: #a67f59 } /* Literal.String.Regex */
+c-[ss] { color: #a67f59 } /* Literal.String.Symbol */
+c-[vc] { color: #0077aa } /* Name.Variable.Class */
+c-[vg] { color: #0077aa } /* Name.Variable.Global */
+c-[vi] { color: #0077aa } /* Name.Variable.Instance */
+c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
+</style>
+<style>/* style-darkmode */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #ddd;
+        --bg: black;
+
+        --unofficial-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cg fill='%23100808' transform='translate(200 200) rotate(-45) translate(-200 -200)' stroke='%23100808' stroke-width='3'%3E%3Ctext x='50%25' y='220' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EUNOFFICIAL%3C/text%3E%3Ctext x='50%25' y='305' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EDRAFT%3C/text%3E%3C/g%3E%3C/svg%3E");
+
+        --logo-bg: #1a5e9a;
+        --logo-active-bg: #c00;
+        --logo-text: white;
+
+        --tocnav-normal-text: #999;
+        --tocnav-normal-bg: var(--bg);
+        --tocnav-hover-text: var(--tocnav-normal-text);
+        --tocnav-hover-bg: #080808;
+        --tocnav-active-text: #f44;
+        --tocnav-active-bg: var(--tocnav-normal-bg);
+
+        --tocsidebar-text: var(--text);
+        --tocsidebar-bg: #080808;
+        --tocsidebar-shadow: rgba(255,255,255,.1);
+        --tocsidebar-heading-text: hsla(203,20%,40%,.7);
+
+        --toclink-text: var(--text);
+        --toclink-underline: #6af;
+        --toclink-visited-text: var(--toclink-text);
+        --toclink-visited-underline: #054572;
+
+        --heading-text: #8af;
+
+        --hr-text: var(--text);
+
+        --algo-border: #456;
+
+        --del-text: #f44;
+        --del-bg: transparent;
+        --ins-text: #4a4;
+        --ins-bg: transparent;
+
+        --a-normal-text: #6af;
+        --a-normal-underline: #555;
+        --a-visited-text: var(--a-normal-text);
+        --a-visited-underline: var(--a-normal-underline);
+        --a-hover-bg: rgba(25%, 25%, 25%, .2);
+        --a-active-text: #f44;
+        --a-active-underline: var(--a-active-text);
+
+        --borderedblock-bg: rgba(255, 255, 255, .05);
+
+        --blockquote-border: silver;
+        --blockquote-bg: var(--borderedblock-bg);
+        --blockquote-text: currentcolor;
+
+        --issue-border: #e05252;
+        --issue-bg: var(--borderedblock-bg);
+        --issue-text: var(--text);
+        --issueheading-text: hsl(0deg, 70%, 70%);
+
+        --example-border: hsl(50deg, 90%, 60%);
+        --example-bg: var(--borderedblock-bg);
+        --example-text: var(--text);
+        --exampleheading-text: hsl(50deg, 70%, 70%);
+
+        --note-border: hsl(120deg, 100%, 35%);
+        --note-bg: var(--borderedblock-bg);
+        --note-text: var(--text);
+        --noteheading-text: hsl(120, 70%, 70%);
+        --notesummary-underline: silver;
+
+        --assertion-border: #444;
+        --assertion-bg: var(--borderedblock-bg);
+        --assertion-text: var(--text);
+
+        --advisement-border: orange;
+        --advisement-bg: #222218;
+        --advisement-text: var(--text);
+        --advisementheading-text: #f84;
+
+        --warning-border: red;
+        --warning-bg: hsla(40,100%,20%,0.95);
+        --warning-text: var(--text);
+
+        --amendment-border: #330099;
+        --amendment-bg: #080010;
+        --amendment-text: var(--text);
+        --amendmentheading-text: #cc00ff;
+
+        --def-border: #8ccbf2;
+        --def-bg: #080818;
+        --def-text: var(--text);
+        --defrow-border: #136;
+
+        --datacell-border: silver;
+
+        --indexinfo-text: #aaa;
+
+        --indextable-hover-text: var(--text);
+        --indextable-hover-bg: #181818;
+
+        --outdatedspec-bg: rgba(255, 255, 255, .5);
+        --outdatedspec-text: black;
+        --outdated-bg: maroon;
+        --outdated-text: white;
+        --outdated-shadow: red;
+
+        --editedrec-bg: darkorange;
+    }
+    /* In case a transparent-bg image doesn't expect to be on a dark bg,
+       which is quite common in practice... */
+    img { background: white; }
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --selflink-text: black;
+        --selflink-bg: silver;
+        --selflink-hover-text: white;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dfnpanel-bg: #222;
+        --dfnpanel-text: var(--text);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .highlight:not(.idl) { background: rgba(255, 255, 255, .05); }
+
+    c-[a] { color: #d33682 } /* Keyword.Declaration */
+    c-[b] { color: #d33682 } /* Keyword.Type */
+    c-[c] { color: #2aa198 } /* Comment */
+    c-[d] { color: #2aa198 } /* Comment.Multiline */
+    c-[e] { color: #268bd2 } /* Name.Attribute */
+    c-[f] { color: #b58900 } /* Name.Tag */
+    c-[g] { color: #cb4b16 } /* Name.Variable */
+    c-[k] { color: #d33682 } /* Keyword */
+    c-[l] { color: #657b83 } /* Literal */
+    c-[m] { color: #657b83 } /* Literal.Number */
+    c-[n] { color: #268bd2 } /* Name */
+    c-[o] { color: #657b83 } /* Operator */
+    c-[p] { color: #657b83 } /* Punctuation */
+    c-[s] { color: #6c71c4 } /* Literal.String */
+    c-[t] { color: #6c71c4 } /* Literal.String.Single */
+    c-[u] { color: #6c71c4 } /* Literal.String.Double */
+    c-[ch] { color: #2aa198 } /* Comment.Hashbang */
+    c-[cp] { color: #2aa198 } /* Comment.Preproc */
+    c-[cpf] { color: #2aa198 } /* Comment.PreprocFile */
+    c-[c1] { color: #2aa198 } /* Comment.Single */
+    c-[cs] { color: #2aa198 } /* Comment.Special */
+    c-[kc] { color: #d33682 } /* Keyword.Constant */
+    c-[kn] { color: #d33682 } /* Keyword.Namespace */
+    c-[kp] { color: #d33682 } /* Keyword.Pseudo */
+    c-[kr] { color: #d33682 } /* Keyword.Reserved */
+    c-[ld] { color: #657b83 } /* Literal.Date */
+    c-[nc] { color: #268bd2 } /* Name.Class */
+    c-[no] { color: #268bd2 } /* Name.Constant */
+    c-[nd] { color: #268bd2 } /* Name.Decorator */
+    c-[ni] { color: #268bd2 } /* Name.Entity */
+    c-[ne] { color: #268bd2 } /* Name.Exception */
+    c-[nf] { color: #268bd2 } /* Name.Function */
+    c-[nl] { color: #268bd2 } /* Name.Label */
+    c-[nn] { color: #268bd2 } /* Name.Namespace */
+    c-[py] { color: #268bd2 } /* Name.Property */
+    c-[ow] { color: #657b83 } /* Operator.Word */
+    c-[mb] { color: #657b83 } /* Literal.Number.Bin */
+    c-[mf] { color: #657b83 } /* Literal.Number.Float */
+    c-[mh] { color: #657b83 } /* Literal.Number.Hex */
+    c-[mi] { color: #657b83 } /* Literal.Number.Integer */
+    c-[mo] { color: #657b83 } /* Literal.Number.Oct */
+    c-[sa] { color: #6c71c4 } /* Literal.String.Affix */
+    c-[sb] { color: #6c71c4 } /* Literal.String.Backtick */
+    c-[sc] { color: #6c71c4 } /* Literal.String.Char */
+    c-[dl] { color: #6c71c4 } /* Literal.String.Delimiter */
+    c-[sd] { color: #6c71c4 } /* Literal.String.Doc */
+    c-[se] { color: #6c71c4 } /* Literal.String.Escape */
+    c-[sh] { color: #6c71c4 } /* Literal.String.Heredoc */
+    c-[si] { color: #6c71c4 } /* Literal.String.Interpol */
+    c-[sx] { color: #6c71c4 } /* Literal.String.Other */
+    c-[sr] { color: #6c71c4 } /* Literal.String.Regex */
+    c-[ss] { color: #6c71c4 } /* Literal.String.Symbol */
+    c-[fm] { color: #268bd2 } /* Name.Function.Magic */
+    c-[vc] { color: #cb4b16 } /* Name.Variable.Class */
+    c-[vg] { color: #cb4b16 } /* Name.Variable.Global */
+    c-[vi] { color: #cb4b16 } /* Name.Variable.Instance */
+    c-[vm] { color: #cb4b16 } /* Name.Variable.Magic */
+    c-[il] { color: #657b83 } /* Literal.Number.Integer.Long */
+}
+</style>
+ <body class="h-entry">
+  <div class="head">
+   <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
+   <h1 class="p-name no-ref" id="title">Locale Extensions</h1>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-11-29">29 November 2023</time></p>
+   <div data-fill-with="spec-metadata">
+    <dl>
+     <dt>This version:
+     <dd><a class="u-url" href="https://github.com/ben-allen/locale-extensions">https://github.com/ben-allen/locale-extensions</a>
+     <dt>Issue Tracking:
+     <dd><a href="https://github.com/ben-allen/locale-extensions/issues/">GitHub</a>
+     <dt class="editor">Editor:
+     <dd class="editor p-author h-card vcard"><a class="p-name fn u-url url" href="https://igalia.com">Ben Allen</a> (<span class="p-org org">Igalia</span>) <a class="u-email email" href="mailto:benallen@igalia.com">benallen@igalia.com</a>
+     <dt>Tests:
+     <dd>
+    </dl>
+   </div>
+   <div data-fill-with="warning"></div>
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2023 the Contributors to the Locale Extensions Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
+   <hr title="Separator for header">
+  </div>
+  <div class="p-summary" data-fill-with="abstract">
+   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+   <p>This specification defines a mechanism for making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements. It provides a JavaScript API and a corresponding set of Client Hints.</p>
+  </div>
+  <div data-fill-with="at-risk"></div>
+  <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
+  <div data-fill-with="status">
+   <p> This specification was published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a>.
+  It is not a W3C Standard nor is it on the W3C Standards Track.
+
+  Please note that under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a> there is a limited opt-out and other conditions apply.
+
+  Learn more about <a href="http://www.w3.org/community/">W3C Community and Business Groups</a>. </p>
+   <p></p>
+  </div>
+  <div data-fill-with="at-risk"></div>
+  <nav data-fill-with="table-of-contents" id="toc">
+   <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
+   <ol class="toc" role="directory">
+    <li><a href="#introduction"><span class="secno">1</span> <span class="content">Introduction</span></a>
+    <li><a href="#locale-extensions-minimal-set"><span class="secno">2</span> <span class="content">Proposed Minimal Set of Unicode Locale Extensions</span></a>
+    <li>
+     <a href="#locale-extensions-features"><span class="secno">3</span> <span class="content">Locale Extension Features</span></a>
+     <ol class="toc">
+      <li>
+       <a href="#locale-extensions-client-hints"><span class="secno">3.1</span> <span class="content">Client Hints</span></a>
+       <ol class="toc">
+        <li><a href="#common-locale-extensions"><span class="secno">3.1.1</span> <span class="content">Common Locale Extensions</span></a>
+        <li><a href="#client-hint-header-fields"><span class="secno">3.1.2</span> <span class="content"><code>Client Hint</code> Header fields</span></a>
+        <li><a href="#locale-extensions-client-hint-example"><span class="secno">3.1.3</span> <span class="content">Usage example</span></a>
+       </ol>
+      <li>
+       <a href="#javascript-api"><span class="secno">3.2</span> <span class="content">JavaScript API</span></a>
+       <ol class="toc">
+        <li><a href="#locale-extensions-javascript-idl"><span class="secno">3.2.1</span> <span class="content">IDL</span></a>
+        <li><a href="#user-locale-extensions-javascript-api-proposed-syntax"><span class="secno">3.2.2</span> <span class="content">Proposed Syntax</span></a>
+       </ol>
+     </ol>
+    <li><a href="#privacy-and-security-considerations"><span class="secno">4</span> <span class="content">Privacy and Security Considerations</span></a>
+    <li>
+     <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
+     <ol class="toc">
+      <li><a href="#w3c-conventions"><span class="secno"></span> <span class="content">Document conventions</span></a>
+      <li><a href="#w3c-conformant-algorithms"><span class="secno"></span> <span class="content">Conformant Algorithms</span></a>
+     </ol>
+    <li>
+     <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
+     <ol class="toc">
+      <li><a href="#index-defined-here"><span class="secno"></span> <span class="content">Terms defined by this specification</span></a>
+      <li><a href="#index-defined-elsewhere"><span class="secno"></span> <span class="content">Terms defined by reference</span></a>
+     </ol>
+    <li>
+     <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
+     <ol class="toc">
+      <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
+     </ol>
+    <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
+   </ol>
+  </nav>
+  <main>
+   <h2 class="heading settled" data-level="1" id="introduction"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#introduction"></a></h2>
+   <p>This proposal defines a mechanism by making a limited subset of the Unicode Extensions for BCP 47 available for content negotiation, providing options that address some of the worst problems with incomplete localization while only exposing coarse-grained data about the users who take advantage of these improvements.</p>
+   <p><a data-link-type="dfn" href="https://cldr.unicode.org/index/bcp47-extension#unicode-extensions-for-bcp-47" id="ref-for-unicode-extensions-for-bcp-47">Unicode Extensions for BCP 47</a> can be used to append additional information needed to identify locales to the end of language identifiers. Enabling support for a subset of BCP tags can help solve problems like the ones below:</p>
+   <blockquote>
+    <p>Currently en-US is the typical untranslated language for software, even though en-US’s region-specific formatting patterns differ from those used globally. As a result, often text with untranslated UI strings will be displayed in a language accessible to all users who speak English, but with temperatures represented in Fahrenheit, a scale which is confusing and unfamiliar to users from regions that use Celcius.</p>
+   </blockquote>
+   <blockquote>
+    <p>In many regions both Western Arabic (Latin) and Eastern Arabic (Arabic-Indic) numerals are in common use. Users in these regions may find one or the other of these numbering systems not immediately intelligible, and desire content tailored to the numbering system with which they are most familiar.</p>
+   </blockquote>
+   <p>For <strong>client-side applications</strong>, the best way to get these preferences is through a browser API that fetches this information from the different platform-specific APIs.</p>
+   <p>For <strong>server-side applications</strong>, one way to access this information is through the use of a <a data-link-type="biblio" href="#biblio-client-hints" title="HTTP Client Hints">[CLIENT-HINTS]</a> header on the request signalling that Unicode Extensions are to be used.</p>
+   <p>In both of these cases the browser conveys data related to the user’s operating system settings to servers, but only sends a tightly limited subset of that data. As currently proposed, exactly three potential locale extension settings are exposed, with each of these settings having at most three possible options. Neither case allows for passive fingerprinting: in order to read these settings, servers must either advertise their intent to use each individual setting via an <code>Accept-CH</code> header or else issue a detectable query to the client.</p>
+   <h2 class="heading settled" data-level="2" id="locale-extensions-minimal-set"><span class="secno">2. </span><span class="content">Proposed Minimal Set of Unicode Locale Extensions</span><a class="self-link" href="#locale-extensions-minimal-set"></a></h2>
+   <p>The following table suggests a minimal set of commonly used locale extensions to be supported. Note that the list of supported possible values for each extension is exhaustive — limiting the range of available options to a few sensible values helps mitigate privacy and security concerns related to providing servers with preferred content tailorings.</p>
+   <table>
+    <tbody>
+     <tr>
+      <td>"hourCycle"
+      <td><code>hc</code>
+      <td><code>h12</code>, <code>h23</code>, <code>auto</code>
+      <td>Preferred hour cycle
+     <tr>
+      <td>"numberingSystem"
+      <td><code>nu</code>
+      <td><code>latn</code>, <code>native</code>, <code>auto</code>
+      <td>Preferred numbering system
+     <tr>
+      <td>"measurementUnit"
+      <td><code>mu</code>
+      <td><code>celcius</code>, <code>fahrenheit</code>, <code>auto</code>
+      <td>Measurement unit for temperature
+    <thead>
+     <tr>
+      <th>Locale Extension Name
+      <th>Unicode Extension Key
+      <th>Possible values
+      <th>Description
+   </table>
+   <blockquote>
+    <p class="note" role="note"><span class="marker">Note:</span> The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.</p>
+   </blockquote>
+   <h2 class="heading settled" data-level="3" id="locale-extensions-features"><span class="secno">3. </span><span class="content">Locale Extension Features</span><a class="self-link" href="#locale-extensions-features"></a></h2>
+   <p>We address the above uses cases by defining a <a href="#javascript-api">§ 3.2 JavaScript API</a> and a corresponding <a data-link-type="biblio" href="#biblio-client-hints" title="HTTP Client Hints">[CLIENT-HINTS]</a> header]. Both will be responsible for exposing and negotiating the exchange of desired tailorings. We define <dfn data-dfn-for="NavigatorLocaleExtensions" data-dfn-type="dfn" data-export id="navigatorlocaleextensions-navigatorlocaleextensions"><code>navigator.localeExtensions</code><a class="self-link" href="#navigatorlocaleextensions-navigatorlocaleextensions"></a></dfn>, and a new set of <dfn data-dfn-type="dfn" data-export id="locale-extensions"><code>Locale-Extensions</code><a class="self-link" href="#locale-extensions"></a></dfn> Client Hints, both of which map locale settings using the following steps:</p>
+   <ol>
+    <li data-md>
+     <p>Validate that specific locale extensions are allowed to be exposed.</p>
+    <li data-md>
+     <p>Read the available OS tailorings</p>
+    <li data-md>
+     <p>Return values for those exposed locale extensions.</p>
+   </ol>
+   <h3 class="heading settled" data-level="3.1" id="locale-extensions-client-hints"><span class="secno">3.1. </span><span class="content">Client Hints</span><a class="self-link" href="#locale-extensions-client-hints"></a></h3>
+   <p>An <a data-link-type="dfn" href="https://datatracker.ietf.org/doc/html/rfc8942#http-client-hint" id="ref-for-http-client-hint">HTTP Client Hint</a> is a request header field that is sent by HTTP clients and used by servers to optimize content served to those clients. The Client Hints infrastructure defines an <code>Accept-CH</code> response header that servers can use to advertise their use of specific request headers for proactive content negotiation. This opt-in mechanism enables clients to send content adaptation data selectively, instead of appending all such data to every outgoing request.</p>
+   <p>Because servers must specify the set of headers they are interested in receiving, the Client Hint mechanism eliminates many of the opportunities for passive fingerprinting that arise when using other means for proactive content negotiation (for example, the User-Agent string). See the [privacy and security section below] for more details.</p>
+   <p>The following table suggests a minimal subset of common locale extensions to be supported. Observe that the list of supported possible values for each extension is exhaustive.</p>
+   <h4 class="heading settled" data-level="3.1.1" id="common-locale-extensions"><span class="secno">3.1.1. </span><span class="content">Common Locale Extensions</span><a class="self-link" href="#common-locale-extensions"></a></h4>
+   <table>
+    <tbody>
+     <tr>
+      <td>"hourCycle"
+      <td><code>hc</code>
+      <td><code>h11</code>, <code>h23</code>, <code>auto</code>
+      <td>Preferred hour cycle
+     <tr>
+      <td>"numberingSystem"
+      <td><code>nu</code>
+      <td><code>latn</code>, <code>native</code>, <code>auto</code>
+      <td>Preferred numbering system
+     <tr>
+      <td>"measurementUnit"
+      <td><code>mu</code>
+      <td><code>celcius</code>, <code>fahrenheit</code>, <code>auto</code>
+      <td>Measurement unit for temperature
+    <thead>
+     <tr>
+      <th>Locale Extension Name
+      <th>Unicode Extension Key
+      <th>Possible values
+      <th>Description
+   </table>
+   <p>Limiting the range of options to a few sensible values helps reduce privacy and security risks related to providing servers with preferred content tailorings. Most notably, restricting the range of available numbering systems to <code>latn</code>, <code>native</code>, and <code>auto</code> allows clients to request one of up to three commonly used numbering systems in that language/region pair, without allowing for selections likely to make users individually identifiable.</p>
+   <blockquote>
+    <p class="note" role="note"><span class="marker">Note:</span> The full set of extensions ultimately included need to be validated and agreed to by security teams and stakeholders.</p>
+   </blockquote>
+   <h4 class="heading settled" data-level="3.1.2" id="client-hint-header-fields"><span class="secno">3.1.2. </span><span class="content"><code>Client Hint</code> Header fields</span><a class="self-link" href="#client-hint-header-fields"></a></h4>
+   <p>Servers cannot passively receive information about locale extension-related settings. Servers instead advertise their ability to use extensions, allowing clients the option to respond with their preferred content tailorings.</p>
+   <p>To accomplish this, browsers should introduce new <code>Client Hint</code> header fields as part of a <a data-link-type="dfn" href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-header-structure#structured-header" id="ref-for-structured-header">structured header</a> as defined in <a data-link-type="biblio" href="#biblio-draft-ietf-httpbis-header-structure-19" title="Structured Field Values for HTTP">[draft-ietf-httpbis-header-structure-19]</a>:</p>
+   <table>
+    <tbody>
+     <tr>
+      <td><dfn data-dfn-type="dfn" data-export id="sec-ch-locale-extensions-hour-cycle"><code>Sec-CH-Locale-Extensions-Hour-Cycle</code><a class="self-link" href="#sec-ch-locale-extensions-hour-cycle"></a></dfn>
+      <td><code>Sec-CH-Locale-Extensions-Hour-Cycle</code> : "h23"
+     <tr>
+      <td><dfn data-dfn-type="dfn" data-export id="sec-ch-locale-extensionsnumbering-system"><code>Sec-CH-Locale-ExtensionsNumbering-System</code><a class="self-link" href="#sec-ch-locale-extensionsnumbering-system"></a></dfn>
+      <td><code>Sec-CH-Locale-Extensions-NumberingSystem</code> : "native"
+     <tr>
+      <td><dfn data-dfn-type="dfn" data-export id="sec-ch-locale-extensions-measurementunit"><code>Sec-CH-Locale-Extensions-MeasurementUnit</code><a class="self-link" href="#sec-ch-locale-extensions-measurementunit"></a></dfn>
+      <td><code>Sec-CH-Locale-Extensions-MeasurementUnit</code> : "auto"
+    <thead>
+     <tr>
+      <th left style="text:align">Client Hint
+      <th>Example output
+   </table>
+   <p>The <code>Sec-</code> prefix used on these headers prevents scripts and other application content from setting them in user agents, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights. See <a href="https://datatracker.ietf.org/doc/html/rfc8942#section-4.2">HTTP Client Hints Section 4.2, Deployment and Security Risks</a> for more information.</p>
+   <h4 class="heading settled" data-level="3.1.3" id="locale-extensions-client-hint-example"><span class="secno">3.1.3. </span><span class="content">Usage example</span><a class="self-link" href="#locale-extensions-client-hint-example"></a></h4>
+   <div class="example" id="example-f0912c2e">
+    <a class="self-link" href="#example-f0912c2e"></a> 
+    <ol>
+     <li data-md>
+      <p>The client makes an initial request to the server:</p>
+    </ol>
+<pre class="language-http highlight"><c- nf>GET</c-> <c- nn>/</c-> <c- kr>HTTP</c-><c- o>/</c-><c- m>1.1</c->
+<c- e>Host</c-><c- o>:</c-> <c- l>example.com</c->
+</pre>
+    <ol start="2">
+     <li data-md>
+      <p>The server responds, telling the client via an <code>Accept-CH</code> header (Section 2.2.1 of <a data-link-type="biblio" href="#biblio-rfc8942" title="HTTP Client Hints">[RFC8942]</a>) along with the initial response with <code>Sec-CH-Locale-Extensions-NumberingSystem</code>. This response indicates that the server accepts that particular Client Hint and no others.</p>
+    </ol>
+<pre class="language-http highlight"><c- kr>HTTP</c-><c- o>/</c-><c- m>1.1</c-> <c- m>200</c-> <c- ne>OK</c->
+<c- e>Content-Type</c-><c- o>:</c-> <c- l>text/html</c->
+<c- e>Accept-CH</c-><c- o>:</c-> <c- l>Sec-CH-Locale-Extensions-NumberingSystem</c->
+</pre>
+    <ol start="3">
+     <li data-md>
+      <p>Subsequent requests to https://example.com will include the following request headers in case <code>numberingSystem</code> is "native":</p>
+    </ol>
+<pre class="language-http highlight"><c- nf>GET</c-> <c- nn>/</c-> <c- kr>HTTP</c-><c- o>/</c-><c- m>1.1</c->
+<c- e>Host</c-><c- o>:</c-> <c- l>example.com</c->
+<c- e>Sec-CH-Locale-Extensions-NumberingSystem</c-><c- o>:</c-> <c- l>"native" </c->
+</pre>
+    <ol start="4">
+     <li data-md>
+      <p>The server can then tailor the response accordingly. For example, if the current locale is <code>hi-IN</code>, the server could generate content with numbers represented in Devanagari numerals.</p>
+    </ol>
+    <p>Note that servers <strong>must</strong> ignore hints that they do not support.</p>
+   </div>
+   <h3 class="heading settled" data-level="3.2" id="javascript-api"><span class="secno">3.2. </span><span class="content">JavaScript API</span><a class="self-link" href="#javascript-api"></a></h3>
+   <p>These client hints should also be exposed as JavaScript APIs via <code>navigator.locales</code> as suggested in <a href="https://github.com/tc39/ecma402/issues/68">#68</a>, or by creating a new <code>navigator.localeExtensions</code> property:</p>
+   <h4 class="heading settled" data-level="3.2.1" id="locale-extensions-javascript-idl"><span class="secno">3.2.1. </span><span class="content">IDL</span><a class="self-link" href="#locale-extensions-javascript-idl"></a></h4>
+<pre class="idl highlight def"><c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="localeextensions"><code><c- g>LocaleExtensions</c-></code></dfn> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="LocaleExtensions" data-dfn-type="attribute" data-export data-readonly data-type="DOMString" id="dom-localeextensions-measurementunit"><code><c- g>measurementUnit</c-></code><a class="self-link" href="#dom-localeextensions-measurementunit"></a></dfn>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString" id="ref-for-idl-DOMString①"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="LocaleExtensions" data-dfn-type="attribute" data-export data-readonly data-type="DOMString" id="dom-localeextensions-numberingsystem"><code><c- g>numberingSystem</c-></code><a class="self-link" href="#dom-localeextensions-numberingsystem"></a></dfn>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString" id="ref-for-idl-DOMString②"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="LocaleExtensions" data-dfn-type="attribute" data-export data-readonly data-type="DOMString" id="dom-localeextensions-hourcycle"><code><c- g>hourCycle</c-></code><a class="self-link" href="#dom-localeextensions-hourcycle"></a></dfn>;
+};
+
+<c- b>interface</c-> <c- b>mixin</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="navigatorlocaleextensions"><code><c- g>NavigatorLocaleExtensions</c-></code></dfn> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#localeextensions" id="ref-for-localeextensions"><c- n>LocaleExtensions</c-></a> <dfn class="idl-code" data-dfn-for="NavigatorLocaleExtensions" data-dfn-type="attribute" data-export data-readonly data-type="LocaleExtensions" id="dom-navigatorlocaleextensions-localeextensions"><code><c- g>localeExtensions</c-></code><a class="self-link" href="#dom-navigatorlocaleextensions-localeextensions"></a></dfn>;
+};
+
+<a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator"><c- n>Navigator</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#navigatorlocaleextensions" id="ref-for-navigatorlocaleextensions"><c- n>NavigatorLocaleExtensions</c-></a>;
+<a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/workers.html#workernavigator" id="ref-for-workernavigator"><c- n>WorkerNavigator</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#navigatorlocaleextensions" id="ref-for-navigatorlocaleextensions①"><c- n>NavigatorLocaleExtensions</c-></a>;
+
+</pre>
+   <h4 class="heading settled" data-level="3.2.2" id="user-locale-extensions-javascript-api-proposed-syntax"><span class="secno">3.2.2. </span><span class="content">Proposed Syntax</span><a class="self-link" href="#user-locale-extensions-javascript-api-proposed-syntax"></a></h4>
+   <div class="example" id="example-0c7bd6a7">
+    <a class="self-link" href="#example-0c7bd6a7"></a> 
+<pre class="language-js highlight">navigator<c- p>.</c->localeExtensions<c- p>[</c-><c- t>'numberingSystem'</c-><c- p>];</c->
+navigator<c- p>.</c->localeExtensions<c- p>.</c->numberingSystem<c- p>;</c->
+self<c- p>.</c->navigator<c- p>.</c->localePreferences<c- p>.</c->languageRegion<c- p>;</c->
+<c- c1>// Output => => "latn"</c->
+
+navigator<c- p>.</c->localeExtensions<c- p>[</c-><c- t>'measurementUnit'</c-><c- p>];</c->
+navigator<c- p>.</c->localeExtensions<c- p>.</c->measurementUnit<c- p>;</c->
+self<c- p>.</c->navigator<c- p>.</c->localePreferences<c- p>.</c->measurementUnit<c- p>;</c->
+<c- c1>// Output => => "celcius"</c->
+
+navigator<c- p>.</c->localeExtensions<c- p>[</c-><c- t>'hourCycle'</c-><c- p>];</c->
+navigator<c- p>.</c->localeExtensions<c- p>.</c->hourCycle<c- p>;</c->
+self<c- p>.</c->navigator<c- p>.</c->localePreferences<c- p>.</c->hourCycle<c- p>;</c->
+<c- c1>// Output => => "h11"</c->
+
+<c- c1>// Window or WorkerGlobalScope event</c->
+
+window<c- p>.</c->onlocaleextensions <c- o>=</c-> <c- p>(</c->event<c- p>)</c-> <c- p>=></c-> <c- p>{</c->
+  console<c- p>.</c->log<c- p>(</c-><c- t>'localeextensions event detected!'</c-><c- p>);</c->
+<c- p>};</c->
+
+<c- c1>// Or</c->
+
+window<c- p>.</c->addEventListener<c- p>(</c-><c- t>'localeextensions'</c-><c- p>,</c-> <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
+  console<c- p>.</c->log<c- p>(</c-><c- t>'localeextensions event detected!'</c-><c- p>);</c->
+<c- p>});</c->
+</pre>
+   </div>
+   <h2 class="heading settled" data-level="4" id="privacy-and-security-considerations"><span class="secno">4. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-and-security-considerations"></a></h2>
+   <p>There are two competing requirements at play when localizing content in the potentially hostile web environment. One is the need to make content and applications accessible and usable to users from as broad a range of linguistic and cultural contexts as possible. The other, equally important, is the need to preserve the safety and privacy of users. Often these two pressures appear diametrically opposed, particularly since proactive content negotiation inevitably requires revealing information that can be used to uniquely identify users.</p>
+   <p><a data-link-type="biblio" href="#biblio-mitigating-browser-fingerprinting" title="Mitigating Browser Fingerprinting in Web Specifications">[Mitigating-Browser-Fingerprinting]</a> identifies the following key elements for fingerprint mitigation, with strength of mitigation given in descending order:</p>
+   <ol>
+    <li data-md>
+     <p>Decreasing the fingerprinting surface</p>
+    <li data-md>
+     <p>Increasing the anonymity set</p>
+    <li data-md>
+     <p>Making fingerprinting detectable (i.e. replacing passive fingerprinting methods with active ones)</p>
+    <li data-md>
+     <p>Clearable local state</p>
+   </ol>
+   <p>This proposal is designed to whenever possible deploy these strategies as appropriate, with preference given to the more effective mitigations higher in the list whenever possible.</p>
+   <p>As noted the security considerations of <a data-link-type="biblio" href="#biblio-client-hints" title="HTTP Client Hints">[CLIENT-HINTS]</a>, a key benefit of the Client Hints architecture is that it allows for proactive content negotiation without exposing passive fingerprinting vectors, becuase servers must actively advertise their use of specific Client Hints headers. This makes it possible to remove preexisting passive fingerprinting vectors and replace them with relatively easily detectable active vectors. The Detectability section of <a data-link-type="biblio" href="#biblio-fingerprinting-guidance" title="Mitigating Browser Fingerprinting in Web Specifications">[fingerprinting-guidance]</a> describes instituting requirements for servers to advertise their use of particular data as a best practice, and mentions Client Hints as a tool for implementing this practice.</p>
+   <p>The use of the <code>Sec-</code> prefix forbids access to headers containing <code>Locale Extensions</code> information from JavaScript, and demarcates them as browser-controlled client hints so that they can be documented and included in requests without triggering CORS preflights.</p>
+   <p>This proposal builds on the potential privacy benefits provided by Client Hints by restricting the available set of locale extension headers to a selection that only exposes low-granularity information. This results in a relatively small reduction of the size of the user’s anonymity set. Both <code>hourCycle</code> and <code>measurementUnit</code> have three options apiece, as does <code>numberingSystem</code>, due to the reduction of available numbering system options to just "latn", "native", and "auto." This reduction allows users to choose between up to three numbering systems that are likely to be legible to them, without allowing for selections that are highly likely to uniquely identify users.</p>
+   <p>As in all uses of Client Hints, user agents must clear opt-in Client Hints settings when site data, browser caches, and cookies are cleared.</p>
+  </main>
+  <div data-fill-with="conformance">
+   <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
+   <h3 class="no-ref no-num heading settled" id="w3c-conventions"><span class="content">Document conventions</span><a class="self-link" href="#w3c-conventions"></a></h3>
+   <p>Conformance requirements are expressed
+    with a combination of descriptive assertions
+    and RFC 2119 terminology.
+    The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL”
+    in the normative parts of this document
+    are to be interpreted as described in RFC 2119.
+    However, for readability,
+    these words do not appear in all uppercase letters in this specification. </p>
+   <p>All of the text of this specification is normative
+    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</a> </p>
+   <p>Examples in this specification are introduced with the words “for example”
+    or are set apart from the normative text
+    with <code>class="example"</code>,
+    like this: </p>
+   <div class="example" id="w3c-example">
+    <a class="self-link" href="#w3c-example"></a> 
+    <p>This is an example of an informative example. </p>
+   </div>
+   <p>Informative notes begin with the word “Note”
+    and are set apart from the normative text
+    with <code>class="note"</code>,
+    like this: </p>
+   <p class="note" role="note">Note, this is an informative note.</p>
+   <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">Conformant Algorithms</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
+   <p>Requirements phrased in the imperative as part of algorithms
+    (such as "strip any leading space characters"
+    or "return false and abort these steps")
+    are to be interpreted with the meaning of the key word
+    ("must", "should", "may", etc)
+    used in introducing the algorithm. </p>
+   <p>Conformance requirements phrased as algorithms or specific steps
+    can be implemented in any manner,
+    so long as the end result is equivalent.
+    In particular, the algorithms defined in this specification
+    are intended to be easy to understand
+    and are not intended to be performant.
+    Implementers are encouraged to optimize. </p>
+  </div>
+<script src="https://www.w3.org/scripts/TR/2021/fixup.js"></script>
+  <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
+  <ul class="index">
+   <li><a href="#dom-localeextensions-hourcycle">hourCycle</a><span>, in § 3.2.1</span>
+   <li><a href="#locale-extensions">Locale-Extensions</a><span>, in § 3</span>
+   <li><a href="#localeextensions">LocaleExtensions</a><span>, in § 3.2.1</span>
+   <li><a href="#dom-navigatorlocaleextensions-localeextensions">localeExtensions</a><span>, in § 3.2.1</span>
+   <li><a href="#dom-localeextensions-measurementunit">measurementUnit</a><span>, in § 3.2.1</span>
+   <li><a href="#navigatorlocaleextensions-navigatorlocaleextensions">navigator.localeExtensions</a><span>, in § 3</span>
+   <li><a href="#navigatorlocaleextensions">NavigatorLocaleExtensions</a><span>, in § 3.2.1</span>
+   <li><a href="#dom-localeextensions-numberingsystem">numberingSystem</a><span>, in § 3.2.1</span>
+   <li><a href="#sec-ch-locale-extensions-hour-cycle">Sec-CH-Locale-Extensions-Hour-Cycle</a><span>, in § 3.1.2</span>
+   <li><a href="#sec-ch-locale-extensions-measurementunit">Sec-CH-Locale-Extensions-MeasurementUnit</a><span>, in § 3.1.2</span>
+   <li><a href="#sec-ch-locale-extensionsnumbering-system">Sec-CH-Locale-ExtensionsNumbering-System</a><span>, in § 3.1.2</span>
+  </ul>
+  <aside class="dfn-panel" data-for="term-for-http-client-hint">
+   <a href="https://datatracker.ietf.org/doc/html/rfc8942#http-client-hint">https://datatracker.ietf.org/doc/html/rfc8942#http-client-hint</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-http-client-hint">3.1. Client Hints</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-unicode-extensions-for-bcp-47">
+   <a href="https://cldr.unicode.org/index/bcp47-extension#unicode-extensions-for-bcp-47">https://cldr.unicode.org/index/bcp47-extension#unicode-extensions-for-bcp-47</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-unicode-extensions-for-bcp-47">1. Introduction</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-structured-header">
+   <a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-header-structure#structured-header">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-header-structure#structured-header</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-structured-header">3.1.2. Client Hint Header fields</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-navigator">
+   <a href="https://html.spec.whatwg.org/multipage/system-state.html#navigator">https://html.spec.whatwg.org/multipage/system-state.html#navigator</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-navigator">3.2.1. IDL</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-workernavigator">
+   <a href="https://html.spec.whatwg.org/multipage/workers.html#workernavigator">https://html.spec.whatwg.org/multipage/workers.html#workernavigator</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-workernavigator">3.2.1. IDL</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
+   <a href="https://webidl.spec.whatwg.org/#idl-DOMString">https://webidl.spec.whatwg.org/#idl-DOMString</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-DOMString">3.2.1. IDL</a> <a href="#ref-for-idl-DOMString①">(2)</a> <a href="#ref-for-idl-DOMString②">(3)</a>
+   </ul>
+  </aside>
+  <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
+  <ul class="index">
+   <li>
+    <a data-link-type="biblio">[]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-http-client-hint">http client hint</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[BCP47-EXTENSION]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-unicode-extensions-for-bcp-47">unicode extensions for bcp 47</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[DRAFT-IETF-HTTPBIS-HEADER-STRUCTURE]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-structured-header">structured header</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[HTML]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-navigator">Navigator</span>
+     <li><span class="dfn-paneled" id="term-for-workernavigator">WorkerNavigator</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-idl-DOMString">DOMString</span>
+    </ul>
+  </ul>
+  <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
+  <dl>
+   <dt id="biblio-client-hints">[CLIENT-HINTS]
+   <dd>Ilya Grigorik; Yoav Weiss. <a href="https://datatracker.ietf.org/doc/rfc8942/"><cite>HTTP Client Hints</cite></a>. RFC - Experimental (February 2021; No errata). URL: <a href="https://datatracker.ietf.org/doc/rfc8942/">https://datatracker.ietf.org/doc/rfc8942/</a>
+   <dt id="biblio-draft-ietf-httpbis-header-structure-19">[DRAFT-IETF-HTTPBIS-HEADER-STRUCTURE-19]
+   <dd>Mark Nottingham; Poul-Henning Kamp. <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-19"><cite>Structured Field Values for HTTP</cite></a>. ID. URL: <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-19">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-19</a>
+   <dt id="biblio-fingerprinting-guidance">[FINGERPRINTING-GUIDANCE]
+   <dd>Nick Doty. <a href="https://w3c.github.io/fingerprinting-guidance/"><cite>Mitigating Browser Fingerprinting in Web Specifications</cite></a>. URL: <a href="https://w3c.github.io/fingerprinting-guidance/">https://w3c.github.io/fingerprinting-guidance/</a>
+   <dt id="biblio-html">[HTML]
+   <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/"><cite>HTML Standard</cite></a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
+   <dt id="biblio-mitigating-browser-fingerprinting">[Mitigating-Browser-Fingerprinting]
+   <dd><a href="https://www.w3.org/TR/fingerprinting-guidance/"><cite>Mitigating Browser Fingerprinting in Web Specifications</cite></a>. TR. URL: <a href="https://www.w3.org/TR/fingerprinting-guidance/">https://www.w3.org/TR/fingerprinting-guidance/</a>
+   <dt id="biblio-rfc2119">[RFC2119]
+   <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
+   <dt id="biblio-rfc8942">[RFC8942]
+   <dd>I. Grigorik; Y. Weiss. <a href="https://www.rfc-editor.org/rfc/rfc8942"><cite>HTTP Client Hints</cite></a>. February 2021. Experimental. URL: <a href="https://www.rfc-editor.org/rfc/rfc8942">https://www.rfc-editor.org/rfc/rfc8942</a>
+   <dt id="biblio-webidl">[WEBIDL]
+   <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
+  </dl>
+  <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
+<pre class="idl highlight def"><c- b>interface</c-> <a href="#localeextensions"><code><c- g>LocaleExtensions</c-></code></a> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString"><c- b>DOMString</c-></a> <a data-readonly data-type="DOMString" href="#dom-localeextensions-measurementunit"><code><c- g>measurementUnit</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString"><c- b>DOMString</c-></a> <a data-readonly data-type="DOMString" href="#dom-localeextensions-numberingsystem"><code><c- g>numberingSystem</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString"><c- b>DOMString</c-></a> <a data-readonly data-type="DOMString" href="#dom-localeextensions-hourcycle"><code><c- g>hourCycle</c-></code></a>;
+};
+
+<c- b>interface</c-> <c- b>mixin</c-> <a href="#navigatorlocaleextensions"><code><c- g>NavigatorLocaleExtensions</c-></code></a> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#localeextensions"><c- n>LocaleExtensions</c-></a> <a data-readonly data-type="LocaleExtensions" href="#dom-navigatorlocaleextensions-localeextensions"><code><c- g>localeExtensions</c-></code></a>;
+};
+
+<a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator"><c- n>Navigator</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#navigatorlocaleextensions"><c- n>NavigatorLocaleExtensions</c-></a>;
+<a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/workers.html#workernavigator"><c- n>WorkerNavigator</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#navigatorlocaleextensions"><c- n>NavigatorLocaleExtensions</c-></a>;
+
+
+</pre>
+  <aside class="dfn-panel" data-for="localeextensions">
+   <b><a href="#localeextensions">#localeextensions</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-localeextensions">3.2.1. IDL</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="navigatorlocaleextensions">
+   <b><a href="#navigatorlocaleextensions">#navigatorlocaleextensions</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-navigatorlocaleextensions">3.2.1. IDL</a> <a href="#ref-for-navigatorlocaleextensions①">(2)</a>
+   </ul>
+  </aside>
+<script>/* script-dfn-panel */
+
+document.body.addEventListener("click", function(e) {
+    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
+    // Find the dfn element or panel, if any, that was clicked on.
+    var el = e.target;
+    var target;
+    var hitALink = false;
+    while(el.parentElement) {
+        if(el.tagName == "A") {
+            // Clicking on a link in a <dfn> shouldn't summon the panel
+            hitALink = true;
+        }
+        if(el.classList.contains("dfn-paneled")) {
+            target = "dfn";
+            break;
+        }
+        if(el.classList.contains("dfn-panel")) {
+            target = "dfn-panel";
+            break;
+        }
+        el = el.parentElement;
+    }
+    if(target != "dfn-panel") {
+        // Turn off any currently "on" or "activated" panels.
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
+            el.classList.remove("on");
+            el.classList.remove("activated");
+        });
+    }
+    if(target == "dfn" && !hitALink) {
+        // open the panel
+        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+        if(dfnPanel) {
+            dfnPanel.classList.add("on");
+            var rect = el.getBoundingClientRect();
+            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+            dfnPanel.style.top = window.scrollY + rect.top + "px";
+            var panelRect = dfnPanel.getBoundingClientRect();
+            var panelWidth = panelRect.right - panelRect.left;
+            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                // Reposition, because the panel is overflowing
+                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+            }
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+        }
+    } else if(target == "dfn-panel") {
+        // Switch it to "activated" state, which pins it.
+        el.classList.add("activated");
+        el.style.left = null;
+        el.style.top = null;
+    }
+
+});
+</script>
