@@ -154,20 +154,6 @@ Native applications can directly read the OS settings for preferred clock, first
 
 The student's preferences can be expressed by the locale extension string `-u-fw-mon-hc-h23-mu-celsius`. Revealing this low-suprisal set of preferences would not by itself dramatically reduce the size of the student's anonymity set. However, we cannot consider the raw number of people expected to have this set of preferences in isolation, because the surprisal of a particular setting conditioned on other known pieces of information about the user can be quite high.
 
-#### Revealed information as conditioned on browser localization
-
-Fingerprinting servers necessarily know other pieces of locale-related information. Most obviously, servers know the contents of the `Accept-Language` header, and can also get equivalent information by consulting `navigator.languages`. For the sake of simplicity, we will refer to the requested locale or locales made available via these two routes as the "browser locale." 
-
-The student in the example above's browser locale will almost certainly reflect either where they're from (in this case, 'nl') or where they're visiting (in this case, 'en-US'). 
-
-1. If the student's browser locale is 'nl', the server can already determine that they most likely prefer `-u-fw-mon-hc-h23-mu-celsius` by inspecting the `Accept-Language` header. Because of the strong correlation between a user's settings and the locale the browser sends, the surprisal of this set of preferences is low. 
-
-2. If the student's browser locale is 'en-US', revealing this preference string will likewise leave them with a relatively large anonymity set &mdash; most people from the regions that use those preferences by default will have left their defaults unchanged, and it is to be expected that there will be other people in the same situation as our student: requesting 'en-US' with OS settings matching the defaults for the hundreds of locales that default to `-u-fw-mon-hc-h23-mu-celsius`.
-
-Determining the number of bits of information revealed in the second of the above scenarios will require user research. If about 5% of users of browsers localized to 'en-US' prefer `-u-fw-mon-hc-h23-mu-celsius`, either because they are, like our student, visiting the United States, or because for whatever reason they simply decided to download a browser version localized to 'en-US', our student has lost around 4.32 bits of entropy by revealing that preference. This is a significant amount of lost entropy.
-
-Note, though, that we have reason to feel somewhat optimistic about *the specific case* of 'en-US', since a large number of people not from the U.S. use browsers localized to 'en-US'. It is possible that sufficient users worldwide fall into this category that it is safe for browsers localized to 'en-US' to reveal relatively more information than other browsers.
-
 
 ### Example: People with preferences that differ from all commonly used locale defaults
 
